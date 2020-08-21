@@ -8,8 +8,8 @@ DATES=$(psql -q -At $SAFEGRAPH -c "\copy (
 
 for DATE in $(echo $DATES)
 do 
-    max_bg_procs 10
+    max_bg_procs 20
     (
-         echo "$DATE"
+         psql $SAFEGRAPH -v DATE=$DATE -f social_distancing/outflow.sql
     ) &
 done;
