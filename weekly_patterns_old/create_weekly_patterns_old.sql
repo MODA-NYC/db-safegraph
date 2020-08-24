@@ -49,7 +49,10 @@ SELECT
     poi_cbg,
     visitor_home_cbgs,
     visitor_daytime_cbgs,
-    visitor_country_of_origin,
+    (CASE
+        WHEN visitor_country_of_origin = '' THEN '{}'::json
+        ELSE visitor_country_of_origin::json
+    END) as visitor_country_of_origin,
     (CASE
         WHEN distance_from_home = '' THEN 0
         ELSE distance_from_home::int
