@@ -17,7 +17,7 @@ CREATE TEMP TABLE tmp (
     poi_cbg VARCHAR(12),
     visitor_home_cbgs json,
     visitor_daytime_cbgs json,
-    visitor_country_of_origin json,
+    visitor_country_of_origin text,
     distance_from_home text,
     median_dwell numeric,
     bucketed_dwell_times json,
