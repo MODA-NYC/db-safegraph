@@ -17,13 +17,12 @@ do
 
             DATEIDX=${DATE//-/}
             # Check if the data for this date is already loaded
-            LOADED=f
-            # LOADED=$(psql -q -At $SAFEGRAPH -c "
-            #     SELECT '$DATE' IN (
-            #         SELECT table_name 
-            #         FROM information_schema.tables 
-            #         WHERE table_schema = 'weekly_patterns'
-            #     )")
+            LOADED=$(psql -q -At $SAFEGRAPH -c "
+                SELECT '$DATE' IN (
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'weekly_patterns'
+                )")
             
             case $LOADED in
                 f) # If not loaded, then load into database
