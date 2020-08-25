@@ -63,4 +63,4 @@ SELECT
     related_same_week_brand,
     device_type
 INTO weekly_patterns.:"DATE" FROM tmp
-WHERE postal_code IN (SELECT LPAD(zip::text, '0') FROM region_zips);
+WHERE LEFT(poi_cbg, 5) IN (SELECT county FROM region);
