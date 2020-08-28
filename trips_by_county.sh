@@ -6,6 +6,8 @@ DATES=$(psql -q -At $SAFEGRAPH -c "\copy (
     WHERE table_schema = 'social_distancing'
 ) to STDOUT CSV")
 
+psql $SAFEGRAPH -f social_distancing/init_trips_by_county.sql
+
 for DATE in $(echo $DATES)
 do 
     max_bg_procs 20
