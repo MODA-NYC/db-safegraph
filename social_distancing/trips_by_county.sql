@@ -2,45 +2,29 @@ SET myvars.date TO :'DATE';
 
 DO $$
 DECLARE
-    computed boolean;
+    week_exists boolean;
+    new_date boolean;
     _year_week text;
     query text;
+
 BEGIN
-    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO computed;
+    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO week_exists;
+    SELECT current_setting('myvars.date')::text NOT IN (SELECT DISTINCT date FROM sg_trips_days_included) INTO new_date;
     SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') INTO _year_week;
     
-    IF computed
+    IF new_date
     THEN
-        SELECT FORMAT(
-            $inner$
-            INSERT INTO sg_trips_by_county
-            SELECT 
-            '%s' as year_week,
-            origin::text,
-            destination::text,
-            sum(counts) as trips
-            FROM (
-            SELECT         
-                LEFT(origin_census_block_group, 5) as origin,
-                LEFT(desti.key, 5) as destination,
-                desti.value::int as counts
-            FROM social_distancing."%s",
-                json_each_text(destination_cbgs) as desti
-            WHERE LEFT(origin_census_block_group, 2) in (
-                '36', '34', '09', '42', '25', '44' 
-            )
-            AND LEFT(desti.key, 2) in (
-                '36', '34', '09', '42', '25', '44' 
-            )) a
-            GROUP BY origin, destination;
-        $inner$, _year_week, current_setting('myvars.date'))
-        INTO query;
-        EXECUTE query;
-    ELSE
-        SELECT FORMAT(
-            $inner$
-            WITH origin_dest AS 
-            (
+        IF week_exists
+        THEN
+            SELECT FORMAT(
+                $inner$
+                INSERT INTO sg_trips_by_county
+                SELECT 
+                '%s' as year_week,
+                origin::text,
+                destination::text,
+                sum(counts) as trips
+                FROM (
                 SELECT         
                     LEFT(origin_census_block_group, 5) as origin,
                     LEFT(desti.key, 5) as destination,
@@ -51,24 +35,55 @@ BEGIN
                     '36', '34', '09', '42', '25', '44' 
                 )
                 AND LEFT(desti.key, 2) in (
-                    '36', '34', '09', '42', '25', '44' )
-            ) 
+                    '36', '34', '09', '42', '25', '44' 
+                )) a
+                GROUP BY origin, destination;
+            $inner$, _year_week, current_setting('myvars.date'))
+            INTO query;
+            EXECUTE query;
+        ELSE
+            SELECT FORMAT(
+                $inner$
+                WITH origin_dest AS 
+                (
+                    SELECT         
+                        LEFT(origin_census_block_group, 5) as origin,
+                        LEFT(desti.key, 5) as destination,
+                        desti.value::int as counts
+                    FROM social_distancing."%s",
+                        json_each_text(destination_cbgs) as desti
+                    WHERE LEFT(origin_census_block_group, 2) in (
+                        '36', '34', '09', '42', '25', '44' 
+                    )
+                    AND LEFT(desti.key, 2) in (
+                        '36', '34', '09', '42', '25', '44' )
+                ) 
 
-            UPDATE sg_trips_by_county a
-            SET trips = a.trips + b.trips
-            FROM
-                (SELECT 
-                '%s' as year_week,
-                origin::text,
-                destination::text,
-                sum(counts) as trips
-                FROM origin_dest
-                GROUP BY origin, destination) b
-            WHERE a.year_week = b.year_week 
-            AND a.origin = b.origin 
-            AND a.destination = b.destination;
-        $inner$, current_setting('myvars.date'), _year_week)
-        INTO query;
-        EXECUTE query;
+                UPDATE sg_trips_by_county a
+                SET trips = a.trips + b.trips
+                FROM
+                    (SELECT 
+                    '%s' as year_week,
+                    origin::text,
+                    destination::text,
+                    sum(counts) as trips
+                    FROM origin_dest
+                    GROUP BY origin, destination) b
+                WHERE a.year_week = b.year_week 
+                AND a.origin = b.origin 
+                AND a.destination = b.destination;
+            $inner$, current_setting('myvars.date'), _year_week)
+            INTO query;
+            EXECUTE query;
+        END IF;
+    SELECT FORMAT(
+        $inner$ 
+        INSERT INTO sg_trips_days_included
+        VALUES ('%s', '%s')
+        $inner$, _year_week, current_setting('myvars.date')::text)
+    INTO query;
+    EXECUTE query;
+    ELSE
+        RAISE NOTICE '% is already loaded !', current_setting('myvars.date')::text;
     END IF;
 END $$

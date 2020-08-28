@@ -4,3 +4,8 @@ CREATE TABLE IF NOT EXISTS sg_trips_by_county (
     destination text,
     trips int
 );
+
+CREATE TABLE IF NOT EXISTS sg_trips_days_included (
+    year_week text,
+    date text
+);
