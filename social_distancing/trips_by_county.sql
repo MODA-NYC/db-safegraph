@@ -6,8 +6,8 @@ DECLARE
     _year_week text;
     query text;
 BEGIN
-    SELECT to_char(current_setting('myvars.date'), 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO computed;
-    SELECT to_char(current_setting('myvars.date'), 'IYYY-IW') INTO _year_week;
+    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO computed;
+    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') INTO _year_week;
 
     IF computed
     THEN
