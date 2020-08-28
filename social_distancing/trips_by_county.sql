@@ -33,7 +33,7 @@ BEGIN
                 '36', '34', '09', '42', '25', '44' 
             )) a
             GROUP BY origin, destination;
-        $inner$, current_setting('myvars.date'), current_setting('myvars.date'))
+        $inner$, _year_week, current_setting('myvars.date'))
         INTO query;
         EXECUTE query;
     ELSE
@@ -54,7 +54,7 @@ BEGIN
                     '36', '34', '09', '42', '25', '44' )
             ) 
 
-            UPDATE sg_trips_by_county.'%s' a
+            UPDATE sg_trips_by_county a
             SET trips = trips + b.trips
             FROM
                 (SELECT 
@@ -67,7 +67,7 @@ BEGIN
             WHERE a.year_week = b.year_week 
             AND a.origin = b.origin 
             AND a.destination = b.destination;
-        $inner$, current_setting('myvars.date'), current_setting('myvars.date'), current_setting('myvars.date'))
+        $inner$, current_setting('myvars.date'), _year_week)
         INTO query;
         EXECUTE query;
     END IF;
