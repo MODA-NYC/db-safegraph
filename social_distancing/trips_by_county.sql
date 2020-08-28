@@ -37,6 +37,34 @@ BEGIN
         INTO query;
         EXECUTE query;
     ELSE
-        RAISE NOTICE '% is already loaded !', _year_week;
+        SELECT FORMAT(
+            $inner$
+            UPDATE sg_trips_by_county.'%s' a
+            SET trips = trips + b.trips
+            FROM
+                (SELECT 
+                '%s' as year_week,
+                origin::text,
+                destination::text,
+                sum(counts) as trips
+                FROM (
+                    SELECT         
+                        LEFT(origin_census_block_group, 5) as origin,
+                        LEFT(desti.key, 5) as destination,
+                        desti.value::int as counts
+                    FROM social_distancing."%s",
+                        json_each_text(destination_cbgs) as desti
+                    WHERE LEFT(origin_census_block_group, 2) in (
+                        '36', '34', '09', '42', '25', '44' 
+                    )
+                    AND LEFT(desti.key, 2) in (
+                        '36', '34', '09', '42', '25', '44' )
+                ) a
+                GROUP BY origin, destination) b
+            JOIN b
+            ON a.year_week = b.year_week AND a.origin = b.origin AND a.destination = b.destination;
+        $inner$, current_setting('myvars.date'), current_setting('myvars.date'))
+        INTO query;
+        EXECUTE query;
     END IF;
 END $$
