@@ -55,7 +55,7 @@ BEGIN
             ) 
 
             UPDATE sg_trips_by_county a
-            SET trips = trips + b.trips
+            SET trips = a.trips + b.trips
             FROM
                 (SELECT 
                 '%s' as year_week,
