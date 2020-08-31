@@ -10,7 +10,7 @@ psql $SAFEGRAPH -f social_distancing/init_trips_by_state.sql
 
 for DATE in $(echo $DATES)
 do 
-    max_bg_procs 20
+    max_bg_procs 1
     (
          psql $SAFEGRAPH -v DATE=$DATE -f social_distancing/trips_by_state.sql
     ) &
