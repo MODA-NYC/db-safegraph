@@ -56,8 +56,7 @@ BEGIN
                     a.origin as state,
                     a.trips as to_nyc,
                     b.trips as from_nyc,
-                    a.trips - b.trips as net_nyc,
-                    NULL as state_geom
+                    a.trips - b.trips as net_nyc
                     FROM pairs a
                     JOIN pairs b
                     ON a.origin=b.destination
@@ -107,8 +106,7 @@ BEGIN
                     a.origin as state,
                     a.trips as to_nyc,
                     b.trips as from_nyc,
-                    a.trips - b.trips as net_nyc,
-                    NULL as state_geom
+                    a.trips - b.trips as net_nyc
                     FROM pairs a
                     JOIN pairs b
                     ON a.origin=b.destination

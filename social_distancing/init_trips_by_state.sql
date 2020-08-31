@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS sg_trips_by_state (
     state text,
     to_nyc int,
     from_nyc int,
-    net_nyc int,
-    state_geom geometry(Geometry,4326)
+    net_nyc int
 );
 
 CREATE TABLE IF NOT EXISTS state_days_included (
