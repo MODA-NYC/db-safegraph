@@ -8,13 +8,21 @@ DECLARE
     query text;
 
 BEGIN
-    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO week_exists;
+    SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO week_exists;
     SELECT current_setting('myvars.date')::text NOT IN (SELECT DISTINCT date FROM county_days_included) INTO new_date;
     SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') INTO _year_week;
     
     IF new_date
     THEN
-        IF week_exists
+        SELECT FORMAT(
+        $inner$ 
+        INSERT INTO county_days_included
+        VALUES ('%s', '%s')
+        $inner$, _year_week, current_setting('myvars.date')::text)
+        INTO query;
+        EXECUTE query;
+
+        IF NOT week_exists
         THEN
             SELECT FORMAT(
                 $inner$
@@ -76,13 +84,6 @@ BEGIN
             INTO query;
             EXECUTE query;
         END IF;
-    SELECT FORMAT(
-        $inner$ 
-        INSERT INTO county_days_included
-        VALUES ('%s', '%s')
-        $inner$, _year_week, current_setting('myvars.date')::text)
-    INTO query;
-    EXECUTE query;
     ELSE
         RAISE NOTICE '% is already loaded !', current_setting('myvars.date')::text;
     END IF;
