@@ -40,10 +40,10 @@ BEGIN
                 FROM social_distancing."%s",
                     json_each_text(destination_cbgs) as desti
                 WHERE LEFT(origin_census_block_group, 2) in (
-                    '36', '34', '09', '42', '25', '44' 
+                    '36', '34', '09', '42', '25', '44', '50', '33'
                 )
                 AND LEFT(desti.key, 2) in (
-                    '36', '34', '09', '42', '25', '44' 
+                    '36', '34', '09', '42', '25', '44', '50', '33'
                 )) a
                 GROUP BY origin, destination;
             $inner$, _year_week, current_setting('myvars.date'))
@@ -61,10 +61,10 @@ BEGIN
                     FROM social_distancing."%s",
                         json_each_text(destination_cbgs) as desti
                     WHERE LEFT(origin_census_block_group, 2) in (
-                        '36', '34', '09', '42', '25', '44' 
+                        '36', '34', '09', '42', '25', '44', '50', '33' 
                     )
                     AND LEFT(desti.key, 2) in (
-                        '36', '34', '09', '42', '25', '44' )
+                        '36', '34', '09', '42', '25', '44', '50', '33' )
                 ) 
 
                 UPDATE sg_trips_by_county a
