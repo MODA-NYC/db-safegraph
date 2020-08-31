@@ -24,6 +24,7 @@ BEGIN
 
         IF NOT week_exists
         THEN
+            RAISE NOTICE 'Loading % to a new week % ', current_setting('myvars.date')::text, _year_week;
             SELECT FORMAT(
                 $inner$
                 INSERT INTO sg_trips_by_county
@@ -50,6 +51,7 @@ BEGIN
             INTO query;
             EXECUTE query;
         ELSE
+            RAISE NOTICE 'Adding % to existing week % ', current_setting('myvars.date')::text, _year_week;
             SELECT FORMAT(
                 $inner$
                 WITH origin_dest AS 
@@ -85,6 +87,6 @@ BEGIN
             EXECUTE query;
         END IF;
     ELSE
-        RAISE NOTICE '% is already loaded !', current_setting('myvars.date')::text;
+        RAISE NOTICE '% is already loaded to records for week %', current_setting('myvars.date')::text, _year_week;
     END IF;
 END $$
