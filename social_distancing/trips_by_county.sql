@@ -9,7 +9,7 @@ DECLARE
 
 BEGIN
     SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') NOT IN (SELECT DISTINCT year_week FROM sg_trips_by_county) INTO week_exists;
-    SELECT current_setting('myvars.date')::text NOT IN (SELECT DISTINCT date FROM sg_trips_days_included) INTO new_date;
+    SELECT current_setting('myvars.date')::text NOT IN (SELECT DISTINCT date FROM county_days_included) INTO new_date;
     SELECT to_char(current_setting('myvars.date')::date, 'IYYY-IW') INTO _year_week;
     
     IF new_date
@@ -78,7 +78,7 @@ BEGIN
         END IF;
     SELECT FORMAT(
         $inner$ 
-        INSERT INTO sg_trips_days_included
+        INSERT INTO county_days_included
         VALUES ('%s', '%s')
         $inner$, _year_week, current_setting('myvars.date')::text)
     INTO query;
