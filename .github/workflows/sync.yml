@@ -2,9 +2,9 @@ name: S3 bucket sync
 
 on:
   repository_dispatch:
-    types: [core_poi]
+    types: [sync]
   schedule:
-    - cron: 0 0 */3 * *
+    - cron: 0 0 * * *
 
 jobs: 
   Sync:
@@ -29,3 +29,7 @@ jobs:
       - name: Sync Core POI ...
         working-directory: _sync
         run: ./core_poi.sh
+      
+      - name: Sync Social Distancing ...
+        working-directory: _sync
+        run: ./social_distancing.sh
