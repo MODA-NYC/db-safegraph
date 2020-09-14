@@ -1,6 +1,6 @@
 #!/bin/bash
 SG_BASEPATH=sg/sg-c19-response/social-distancing/v2
-RDP_BASEPATH=rdp/recovery-data-partnership/social-distancing/v2
+RDP_BASEPATH=rdp/recovery-data-partnership/social_distancing/v2
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -20,12 +20,13 @@ function max_bg_procs {
 
 for INFO in $(mc ls --recursive --json $SG_BASEPATH)
 do
-    max_bg_procs 5
+    max_bg_procs 10
     (
         KEY=$(echo $INFO | jq -r '.key')
+        FILENAME=$(basename $KEY)
 
         # Check existence
-        STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
+        STATUS=$(mc stat --json $RDP_BASEPATH/$FILENAME | jq -r '.status')
         
         case $STATUS in
         success)
@@ -34,7 +35,7 @@ do
         ;;
         error)
             # if not, create a sync ...
-            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
+            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$FILENAME
         ;;
         esac
     ) &
