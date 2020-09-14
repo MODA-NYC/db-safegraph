@@ -1,6 +1,6 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/social-distancing/v2/
-RDP_BASEPATH=rdp/recovery-data-partnership/social-distancing/v2/
+SG_BASEPATH=sg/sg-c19-response/social-distancing/v2
+RDP_BASEPATH=rdp/recovery-data-partnership/social-distancing/v2
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
