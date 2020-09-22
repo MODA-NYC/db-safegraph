@@ -33,3 +33,7 @@ jobs:
       - name: Sync Social Distancing ...
         working-directory: _sync
         run: ./social_distancing.sh
+
+      - name: Sync Monthly Patterns ...
+        working-directory: _sync
+        run: ./monthly_patterns.sh
