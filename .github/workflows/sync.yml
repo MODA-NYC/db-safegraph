@@ -37,3 +37,7 @@ jobs:
       - name: Sync Monthly Patterns ...
         working-directory: _sync
         run: ./monthly_patterns.sh
+
+      - name: Sync Weekly Patterns ...
+        working-directory: _sync
+        run: ./weekly_patterns.sh
