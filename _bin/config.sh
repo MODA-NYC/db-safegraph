@@ -1,4 +1,6 @@
 #!/bin/bash
+DATE=$(date "+%Y-%m-%d")
+
 function set_env {
   for envfile in $@
   do
