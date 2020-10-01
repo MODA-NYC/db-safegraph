@@ -16,3 +16,11 @@ function setup {
     mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
 }
 register 'setup' '' '' setup
+
+function run {
+    (
+        cd $(pwd)/recipes/$1
+        bash runner.sh $2
+    )
+}
+register 'run' 'recipe' '{ recipe name }' run
