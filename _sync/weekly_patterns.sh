@@ -1,5 +1,4 @@
 #!/bin/bash
-source config.sh
 SG_BASEPATH=sg/sg-c19-response/weekly-patterns/v2
 SG_BASEPATH_NEW=sg/sg-c19-response/weekly-patterns-delivery/weekly
 RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns
@@ -27,7 +26,7 @@ do
         NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
         FILENAME=$(basename $KEY)
         SUBPATH=$(echo $KEY | cut -c-13)
-        if ! [ "$FILENAME" = "_SUCCESS" ]; then
+        if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
@@ -41,7 +40,7 @@ do
                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
             ;;
             esac
-        else echo "ignore _SUCCESS"
+        else echo "ignore $FILENAME"
         fi
     ) &
 done
@@ -56,7 +55,7 @@ do
         NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
         FILENAME=$(basename $KEY)
         SUBPATH=$(echo $KEY | cut -c-13)
-        if ! [ "$FILENAME" = "_SUCCESS" ]; then
+        if  [ "${FILENAME#*.}" = "csv.gz" ]; then
 
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
@@ -70,7 +69,7 @@ do
                 mc cp $SG_BASEPATH_NEW/$KEY $RDP_BASEPATH/$NEW_KEY
             ;;
             esac
-        else echo "ignore _SUCCESS"
+        else echo "ignore $FILENAME"
         fi
     ) &
 done
