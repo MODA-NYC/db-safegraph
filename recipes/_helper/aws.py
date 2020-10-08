@@ -2,7 +2,7 @@ import boto3
 import os
 import time
 from botocore.errorfactory import ClientError
-
+import pprint
 
 class Aws:
     def __init__(
@@ -40,6 +40,7 @@ class Aws:
 
         self.bucket = "recovery-data-partnership"
         self.temporary_location = f"{self.bucket}/tmp/"
+        self.pp=pprint.PrettyPrinter(indent=4)
 
     def execute_query(self, query: str, database: str, output: str):
         """
@@ -54,8 +55,8 @@ class Aws:
         if response["Status"] == "SUCCEEDED":
             moved = self.move_output(queryLoc, queryMetadata, output)
             if moved:
-                print("Done !")
-                return response
+                print("Done !\n")
+        self.pp.pprint(response)
 
     def start_query(self, query: str, database: str) -> str:
         """
@@ -89,8 +90,8 @@ class Aws:
         TotalExecutionTimeInSeconds = (
                     QueryExecution["Statistics"]["TotalExecutionTimeInMillis"] / 1000
                 )
-        print(f"Time elapsed: {TotalExecutionTimeInSeconds}")
-
+        print(f"Time elapsed: {TotalExecutionTimeInSeconds} Status: {status}")
+        
         if status in ("QUEUED", "RUNNING"):
             # If query is in queue, or query is running, 
             # then sleep for 10s then check status again
@@ -112,7 +113,10 @@ class Aws:
         1. Assuming file is ready, then copy file (queryLoc -> outputLoc)
         2. Remove file from temporary location (queryLoc, queryMetadata)
         """
-        self.s3.Object(self.bucket, outputLoc).copy_from(CopySource=queryLoc)
+        if self.check_file_exisitence(outputLoc):
+            # Delete old file before uploading new file
+            self.s3.Object(self.bucket, outputLoc).delete()
+            self.s3.Object(self.bucket, outputLoc).copy_from(CopySource=queryLoc)
 
         if self.check_file_exisitence(outputLoc):
             # If file is successly moved queryLoc -> outputLoc
