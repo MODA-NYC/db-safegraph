@@ -8,8 +8,12 @@ class Aws:
     def __init__(
         self,
         aws_region_name,
+
+        # S3 credentials 
         rdp_access_key_id,
         rdp_secret_access_key,
+
+        # Athena Credentials
         aws_access_key_id,
         aws_secret_access_key,
     ):
@@ -116,7 +120,8 @@ class Aws:
         if self.check_file_exisitence(outputLoc):
             # Delete old file before uploading new file
             self.s3.Object(self.bucket, outputLoc).delete()
-            self.s3.Object(self.bucket, outputLoc).copy_from(CopySource=queryLoc)
+        
+        self.s3.Object(self.bucket, outputLoc).copy_from(CopySource=queryLoc)
 
         if self.check_file_exisitence(outputLoc):
             # If file is successly moved queryLoc -> outputLoc
