@@ -1,0 +1,26 @@
+name: Create Docker Image
+
+on:
+  push:
+    paths: 
+    - 'Dockerfile'
+    - '.github/workflows/docker.yml'
+    - 'requirements.txt'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Log into Docker registry
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+      
+    - name: Build the Docker image and Push to Dockerhub
+      run: |
+        DATE=$(date "+%Y-%m-%d")
+        docker build . --file Dockerfile --tag nycplanning/safegraph:$DATE
+        docker tag nycplanning/safegraph:$DATE nycplanning/safegraph:latest
+        docker push nycplanning/safegraph:$DATE
+        docker push nycplanning/safegraph:latest
