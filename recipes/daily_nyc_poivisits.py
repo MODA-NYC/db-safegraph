@@ -39,5 +39,5 @@ LEFT JOIN (
 aws.execute_query(
     query=query, 
     database="safegraph", 
-    output="output/poi/safegraph_daily_nyc_poivisits.csv"
+    output="output/poi/daily_nyc_poivisits.csv"
 )
