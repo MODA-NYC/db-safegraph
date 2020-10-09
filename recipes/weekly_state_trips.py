@@ -1,5 +1,27 @@
 from _helper import aws
 
+"""
+DESCRIPTION:
+   This script parses social distancing trip data to create weekly counts of
+   trips between NYC counties and all 50 states.
+
+INPUTS:
+    safegraph.social_distancing (
+        origin_census_block_group text,
+        destination_cbgs json, 
+        date_range_start date
+    )
+
+OUTPUTS:
+    outputs/weekly_county_trips (
+        year_week text,
+        state varchar(2),
+        to_nyc int,
+        from_nyc int,
+        net_nyc int
+    )
+"""
+
 query = """
 WITH dataset AS (
   SELECT date_start, origin_census_block_group, map_keys(a) as cbg, a from (
