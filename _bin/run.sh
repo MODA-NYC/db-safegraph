@@ -19,8 +19,7 @@ register 'setup' '' '' setup
 
 function run {
     (
-        cd $(pwd)/recipes/$1
-        bash runner.sh $2
+        python3 $(pwd)/recipes/$1.py
     )
 }
 register 'run' 'recipe' '{ recipe name }' run
