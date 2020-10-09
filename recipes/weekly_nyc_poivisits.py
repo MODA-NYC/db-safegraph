@@ -49,5 +49,5 @@ GROUP BY EXTRACT(year from a.date_current),
 aws.execute_query(
     query=query, 
     database="safegraph", 
-    output="output/poi/safegraph_weekly_nyc_poivisits.csv"
+    output="output/poi/weekly_nyc_poivisits.csv"
 )

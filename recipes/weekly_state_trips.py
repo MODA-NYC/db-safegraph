@@ -48,5 +48,5 @@ SELECT
 aws.execute_query(
     query=query, 
     database="safegraph", 
-    output="output/social_distancing/safegraph_weekly_state_trips.csv"
+    output="output/social_distancing/weekly_state_trips.csv"
 )
