@@ -6,8 +6,7 @@ WITH dataset AS (
      SELECT origin_census_block_group,
             CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
             CAST(json_parse(destination_cbgs) AS  map<varchar, varchar>) as a 
-     FROM social_distancing
-     LIMIT 150) b
+     FROM social_distancing) b
  ),
  
  pairs AS (
