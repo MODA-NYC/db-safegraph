@@ -1,5 +1,4 @@
 #!/bin/bash
-source config.sh
 SG_BASEPATH=sg/sg-c19-response/monthly-patterns/patterns_backfill
 SG_BASEPATH_NEW=sg/sg-c19-response/monthly-patterns/patterns
 RDP_BASEPATH=rdp/recovery-data-partnership/monthly_patterns
