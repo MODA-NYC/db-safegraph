@@ -8,7 +8,7 @@ WITH dataset AS (
             CAST(json_parse(destination_cbgs) AS  map<varchar, varchar>) as a 
      FROM social_distancing
      WHERE SUBSTR(origin_census_block_group, 1, 2) IN ('36', '34', '09', '42', '25', '44', '50', '33')
-     LIMIT 30) b
+    ) b
  ) 
  SELECT 
      CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
