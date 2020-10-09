@@ -1,5 +1,45 @@
 from _helper import aws
 
+"""
+DESCRIPTION:
+   This script parses point-of-interest visit counts from the safegraph monthly patterns
+   data to create a table containing the number of visits to individual POIs
+   per day. It only includes POIs within NYC.
+
+INPUTS:
+    safegraph.monthly_patterns (
+        safegraph_place_id text,
+        location_name text, 
+        poi_cbg text,
+        date_range_start date,
+        date_range_end date,
+        visits_by_day json
+    )
+
+    safegraph.core_poi (
+        safegraph_place_id text, 
+        street_address text, 
+        latitude numeric, 
+        longitude numeric,
+        naics_code varchar(6), 
+        top_category text, 
+        sub_category text,
+        region varchar(2)
+    )
+    
+OUTPUTS:
+    outputs/daily_nyc_poivisits (
+        date text,
+        poi text,
+        address text,
+        poi_cbg text,
+        naics_code varchar(6),
+        visits int,
+        latitude numeric,
+        longitude numeric
+    )
+"""
+
 query = """
 WITH daily_visits AS(
 SELECT safegraph_place_id, location_name, poi_cbg, date_add('day', row_number() over(), date_start) AS date_current, CAST(visits AS SMALLINT) as visits
