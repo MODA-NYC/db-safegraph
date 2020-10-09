@@ -12,7 +12,6 @@ FROM (
      cast(json_parse(visits_by_day) as array<varchar>) as a
   FROM safegraph.monthly_patterns
   WHERE SUBSTR(poi_cbg,1,5) IN ('36085','36081','36061','36047','36005')
-  LIMIT 3
 ) b
 CROSS JOIN UNNEST(a) as t(visits)
 )
