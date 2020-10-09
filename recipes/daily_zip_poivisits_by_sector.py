@@ -32,9 +32,7 @@ SELECT
    END) as borocode,
    postal_code as zipcode,
    SUBSTR(a.poi_cbg,1,5) as fips_county,
-   b.naics_code,
-   b.top_category,
-   b.sub_category,
+   SUBSTR(b.naics_code,1,2) as sector,
    SUM(a.visits) as total_visits
 FROM daily_visits a
 LEFT JOIN (
@@ -46,9 +44,7 @@ LEFT JOIN (
 GROUP BY a.date_current,
          SUBSTR(a.poi_cbg,1,5),
          a.postal_code,
-         b.naics_code,
-         b.top_category,
-         b.sub_category
+         SUBSTR(b.naics_code,1,2)
 """
 
 aws.execute_query(

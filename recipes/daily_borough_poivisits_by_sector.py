@@ -31,9 +31,7 @@ SELECT
         WHEN SUBSTR(a.poi_cbg,1,5) = '36085' THEN 5
    END) as borocode,
    SUBSTR(a.poi_cbg,1,5) as fips_county,
-   b.naics_code,
-   b.top_category,
-   b.sub_category,
+   SUBSTR(b.naics_code,1,2) as sector,
    SUM(a.visits) as total_visits
 FROM daily_visits a
 LEFT JOIN (
@@ -44,9 +42,7 @@ LEFT JOIN (
     ON a.safegraph_place_id=b.safegraph_place_id
 GROUP BY a.date_current,
          SUBSTR(a.poi_cbg,1,5),
-         b.naics_code,
-         b.top_category,
-         b.sub_category
+         SUBSTR(b.naics_code,1,2)
 """
 
 aws.execute_query(
