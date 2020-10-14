@@ -20,6 +20,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.social_distancing (
   `median_percentage_time_home` STRING,
   `bucketed_percentage_time_home` STRING
   )
+PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',
