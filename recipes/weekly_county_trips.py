@@ -3,6 +3,29 @@ import sys
 from math import ceil
 import datetime
 
+"""
+DESCRIPTION:
+   This script parses social distancing trip data to create weekly counts of
+   trips between counties for all counties in NY, NJ, PA, CT, RI, MA, VT, and NH
+
+INPUTS:
+    safegraph.social_distancing (
+        origin_census_block_group text,
+        destination_cbgs json, 
+        date_range_start date
+    )
+
+OUTPUTS:
+    outputs/weekly_county_trips (
+        year_week text,
+        fips_county_origin varchar(5),
+        fips_county_destination varchar(5),
+        weekday_trips int,
+        weekend_trips int,
+        all_trips int
+    )
+"""
+
 '''
 # Load historical quarters, beginning 2019-01-01
 quarters = {'2019Q1':('2019-01-01', '2019-03-31'),

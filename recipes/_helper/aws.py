@@ -3,6 +3,8 @@ import os
 import time
 from botocore.errorfactory import ClientError
 import pprint
+import tempfile
+import shutil
 
 class Aws:
     def __init__(
@@ -57,7 +59,7 @@ class Aws:
         queryId, queryLoc, queryMetadata = self.start_query(query, database)
         response = self.wait_till_finish(queryId)
         if response["Status"] == "SUCCEEDED":
-            moved = self.move_output(queryLoc, queryMetadata, output)
+            moved = self.move_compress_output(queryLoc, queryMetadata, output)
             if moved:
                 print("Done !\n")
         self.pp.pprint(response)
@@ -122,7 +124,9 @@ class Aws:
             self.s3.Object(self.bucket, outputLoc).delete()
         
         self.s3.Object(self.bucket, outputLoc).copy_from(CopySource=queryLoc)
+        return self.remove_temp_files(queryLoc, queryMetadata, outputLoc)
 
+    def remove_temp_files(self, queryLoc: str, queryMetadata: str, outputLoc: str):
         if self.check_file_exisitence(outputLoc):
             # If file is successly moved queryLoc -> outputLoc
             # Then delete the files stored at temporary location
@@ -140,6 +144,62 @@ class Aws:
         else:
             print("Filed not moved, cannot proceed")
             return False
+
+    def move_compress_output(self, queryLoc: str, queryMetadata: str, outputLoc: str):
+        """
+        1. Assuming file is ready, then 
+            1. download file queryLoc
+            2. compress locally
+            3. upload to outputLoc
+        2. Remove file from temporary location (queryLoc, queryMetadata)
+        """
+        zipFileName = outputLoc.split('/')[-1].replace(f'{self.bucket}/', '')
+        csvFileName = zipFileName.replace('.zip','')
+
+        # The file will be downloaded to the temporary directory
+        tempdir = tempfile.mkdtemp()
+        zipFielPath = tempdir + '/' + zipFileName
+        csvFilePath = tempdir + '/' + csvFileName
+
+        self.download_file(
+            queryLoc.replace(f'{self.bucket}/', ''), 
+            csvFilePath
+        )
+        self.file_compression(csvFilePath, zipFielPath)
+
+        if self.check_file_exisitence(outputLoc):
+            # Delete old file before uploading new file
+            self.s3.Object(self.bucket, outputLoc).delete()
+    
+        self.upload_file(zipFielPath, outputLoc)     
+        shutil.rmtree(tempdir)   
+        return self.remove_temp_files(queryLoc, queryMetadata, outputLoc)
+        
+    
+    def download_file(self, objectLoc:str, outputLoc:str):
+        if self.check_file_exisitence(objectLoc):
+            with open(outputLoc, 'wb') as data:
+                self.s3.Object(self.bucket, objectLoc)\
+                    .download_fileobj(data)
+            print(f'{objectLoc} downloaded to {outputLoc}')
+        else: 
+            print(f'{objectLoc} doesn\'t exist')
+
+    def file_compression(self, csvFilePath:str, zipFielPath:str):
+        tmpdir='/'.join(csvFilePath.split('/')[:-1])
+        csvFileName=csvFilePath.split('/')[-1]
+        zipFileName=csvFilePath.split('/')[-1]+'.zip'
+
+        os.system(f'pwd')
+        os.system(f'( cd {tmpdir} && zip -9 {zipFileName} {csvFileName} )')
+        os.system(f'rm {csvFilePath}')
+        print(f'{csvFilePath} compressed to {zipFielPath}')
+    
+    def upload_file(self, localPath:str, outputLoc:str):
+        with open(localPath, 'rb') as data:
+            self.s3.Object(self.bucket, outputLoc)\
+                .upload_fileobj(data)
+        print(f'{localPath} uploaded to {outputLoc}')
 
     def check_file_exisitence(self, fileLoc):
         """

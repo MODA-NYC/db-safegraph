@@ -1,13 +1,6 @@
 # db-safegraph
 SafeGraph ETL
 
-## Resources
-Data Science Resources
-https://docs.safegraph.com/docs/data-science-resources
-
-Google colab notebooks
-https://colab.research.google.com/drive/1u15afRytJMsizySFqA2EPlXSh3KTmNTQ#sandboxMode=true&scrollTo=WUWFYLLXowUJ
-
 ## Instructions
 1. Install dependencies
 ```bash
@@ -38,3 +31,7 @@ Commands:
   setup  Install minio and set up the accounts we need
   sync   Syncing a safegraph data source, under the ./_sync folder
 ```
+
+## Resources
+- [Data Science Resources](https://docs.safegraph.com/docs/data-science-resources)
+- [Colab - Quantifying Sampling Bias in SafeGraph Patterns](https://colab.research.google.com/drive/1u15afRytJMsizySFqA2EPlXSh3KTmNTQ#sandboxMode=true&scrollTo=WUWFYLLXowUJ)

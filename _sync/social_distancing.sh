@@ -24,9 +24,12 @@ do
     (
         KEY=$(echo $INFO | jq -r '.key')
         FILENAME=$(basename $KEY)
+        DATE=$(echo $FILENAME | cut -c1-10)
+        PARTITION="dt=$DATE"
 
+        echo $RDP_BASEPATH/$PARTITION/$FILENAME
         # Check existence
-        STATUS=$(mc stat --json $RDP_BASEPATH/$FILENAME | jq -r '.status')
+        STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$FILENAME | jq -r '.status')
         
         case $STATUS in
         success)
@@ -35,9 +38,10 @@ do
         ;;
         error)
             # if not, create a sync ...
-            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$FILENAME
+            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$FILENAME
         ;;
         esac
+        break
     ) &
 done;
 
