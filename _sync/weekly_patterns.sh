@@ -18,37 +18,37 @@ function max_bg_procs {
     done
 }
 
-# for INFO in $(mc ls --recursive --json $SG_BASEPATH)
-# do 
-#     max_bg_procs 5
-#     (
-#         KEY=$(echo $INFO | jq -r '.key')
-#         NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
-#         FILENAME=$(basename $KEY)
-#         DATE=$(echo $FILENAME | cut -c1-10)
-#         PARTITION="dt=$DATE"
-#         SUBPATH=$(echo $KEY | cut -c-13)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH)
+do 
+    max_bg_procs 5
+    (
+        KEY=$(echo $INFO | jq -r '.key')
+        NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
+        FILENAME=$(basename $KEY)
+        DATE=$(echo $FILENAME | cut -c1-10)
+        PARTITION="dt=$DATE"
+        SUBPATH=$(echo $KEY | cut -c-13)
 
-#         if [ "${FILENAME#*.}" = "csv.gz" ]; then
+        if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
-#             # Check existence
-#             STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            # Check existence
+            STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
             
-#             case $STATUS in
-#             success)
-#                 echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
-#             ;;
-#             error)
-#                 # Download data and unzip, remove README.txt and the original .zip file
-#                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
-#             ;;
-#             esac
-#         else echo "ignore $FILENAME"
-#         fi
-#     ) &
-# done
-# wait
-# echo "Syncing Backfill Complete!"
+            case $STATUS in
+            success)
+                echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
+            ;;
+            error)
+                # Download data and unzip, remove README.txt and the original .zip file
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
+            ;;
+            esac
+        else echo "ignore $FILENAME"
+        fi
+    ) &
+done
+wait
+echo "Syncing Backfill Complete!"
 
 for INFO in $(mc ls --recursive --json $SG_BASEPATH_NEW)
 do 

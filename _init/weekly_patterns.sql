@@ -25,6 +25,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns (
   `related_same_week_brand` string,
   `device_type` string 
 )
+PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',
