@@ -19,6 +19,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi
   `open_hours` string,
   `category_tags` string 
 )
+PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',

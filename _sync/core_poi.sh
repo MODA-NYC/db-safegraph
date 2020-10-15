@@ -10,9 +10,10 @@ do
     LOCAL_KEY=tmp/$KEY
     LOCAL_PARENT=$(dirname $LOCAL_KEY)
     PREFIX=${PARENT////}
-
+    DATE=$(python3 -c "print('$PARENT'.replace('/', '-')+'-01')")
+    PARTITION="dt=$DATE"
     # Check existence
-    STATUS=$(mc stat --json $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv | jq -r '.status')
+    STATUS=$(mc stat --json $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv | jq -r '.status')
     
     case $STATUS in
     success)
@@ -25,14 +26,14 @@ do
         rm $LOCAL_PARENT/*.zip && rm $LOCAL_PARENT/*.txt
         
         # Upload brand_info to a seperate folder
-        mc cp $LOCAL_PARENT/brand_info.csv $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv
+        mc cp $LOCAL_PARENT/brand_info.csv $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv
         
         # Upload *.csv.gz files one by one
         for FILE in $(ls $LOCAL_PARENT/*.gz)
         do
             (
                 FILENAME=$(basename $FILE)
-                mc cp $FILE $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                mc cp $FILE $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
             ) &
         done;
         wait
