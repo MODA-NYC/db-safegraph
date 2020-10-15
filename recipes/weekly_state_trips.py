@@ -1,4 +1,6 @@
 from _helper import aws
+from _helper.quarters import PastQs, get_quarter
+import sys
 
 """
 DESCRIPTION:
@@ -28,7 +30,9 @@ WITH dataset AS (
      SELECT origin_census_block_group,
             CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
             CAST(json_parse(destination_cbgs) AS  map<varchar, varchar>) as a 
-     FROM social_distancing) b
+     FROM social_distancing
+     WHERE CAST('{0}' AS DATE) < dt
+     AND CAST('{1}' AS DATE) > dt) b
  ),
  
  pairs AS (
@@ -66,8 +70,17 @@ SELECT
    WHERE a.origin <> 'NYC'
 """
 
-aws.execute_query(
-    query=query, 
-    database="safegraph", 
-    output="output/social_distancing/weekly_state_trips.csv"
-)
+# Load the current quarter
+# quarters = get_quarter()
+
+quarters = PastQs
+
+for year_qrtr, range in quarters.items():
+    start = range[0]
+    end = range[1]
+    print(year_qrtr, start, end) 
+    aws.execute_query(
+        query=query.format(start, end, poi_latest_date), 
+        database="safegraph", 
+        output=f"output/poi/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
+    )
