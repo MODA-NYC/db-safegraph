@@ -80,7 +80,7 @@ for year_qrtr, range in quarters.items():
     end = range[1]
     print(year_qrtr, start, end) 
     aws.execute_query(
-        query=query.format(start, end, poi_latest_date), 
+        query=query.format(start, end), 
         database="safegraph", 
         output=f"output/poi/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
     )
