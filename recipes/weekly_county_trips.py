@@ -50,7 +50,7 @@ SELECT date_start, origin_census_block_group, map_keys(a) as cbg, a from (
     ) b
 ) 
 SELECT 
-    CAST(EXTRACT(year from date_start) AS VARCHAR)||'W'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
+    CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
     SUBSTR(origin_census_block_group, 1, 5) as fips_county_origin,
     SUBSTR(desti_cbgs, 1, 5) as fips_county_destination,
     SUM(CASE WHEN EXTRACT(dow from date_start) NOT IN (0, 6) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekday_trips,

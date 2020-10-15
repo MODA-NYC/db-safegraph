@@ -33,7 +33,7 @@ WITH dataset AS (
  
  pairs AS (
  SELECT 
-     CAST(EXTRACT(year from date_start) AS VARCHAR)||'W'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
+     CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
      (CASE WHEN SUBSTR(origin_census_block_group, 1, 5) IN ('36085','36081','36061','36047','36005')
            THEN 'NYC'
       ELSE SUBSTR(origin_census_block_group, 1, 2)

@@ -65,7 +65,7 @@ CROSS JOIN UNNEST(a) as t(visits)
 )
 
 SELECT
-   CAST(EXTRACT(year from a.date_current) AS VARCHAR)||'W'||LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
+   CAST(EXTRACT(year from a.date_current) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
    a.location_name as poi,
    b.street_address as address,
    a.poi_cbg,
