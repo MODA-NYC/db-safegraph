@@ -38,7 +38,7 @@ jobs:
         working-directory: recipe
         run: ./sg run --name daily_nyc_poivisits
 
-    - name: Update daily_zip_poivisits_by_sector ...
+      - name: Update daily_zip_poivisits_by_sector ...
         working-directory: recipes
         run: ./sg run --name daily_zip_poivisits_by_sector
       
