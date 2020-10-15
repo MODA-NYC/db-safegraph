@@ -19,13 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install dependencies ...
-        run: |
-          curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
-          chmod +x mc
-          sudo mv ./mc /usr/bin
-          mc config host add sg $SG_S3_ENDPOINT $SG_ACCESS_KEY_ID $SG_SECRET_ACCESS_KEY --api S3v4
-          mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
-          pip3 install -r requirements.txt
+        run: pip3 install -r requirements.txt
 
       - name: Update daily_borough_poivisits_by_sector ...
         run: ./sg run --name daily_borough_poivisits_by_sector
