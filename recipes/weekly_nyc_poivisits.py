@@ -114,5 +114,5 @@ for year_qrtr, range in quarters.items():
     aws.execute_query(
         query=query.format(start, end), 
         database="safegraph", 
-        output=f"output/poi/weekly_nyc_poivisits/weekly_nyc_poivisits_{year_qrtr}.csv"
+        output=f"output/poi/weekly_nyc_poivisits/weekly_nyc_poivisits_{year_qrtr}.csv.zip"
     )
