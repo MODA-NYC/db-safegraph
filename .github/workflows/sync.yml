@@ -16,6 +16,9 @@ jobs:
       SG_S3_ENDPOINT: https://s3.wasabisys.com
       SG_ACCESS_KEY_ID: ${{ secrets.SG_ACCESS_KEY_ID }}
       SG_SECRET_ACCESS_KEY: ${{ secrets.SG_SECRET_ACCESS_KEY }}
+      AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v2
       - name: install dependencies ...
@@ -33,10 +36,6 @@ jobs:
       - name: Sync Social Distancing ...
         working-directory: _sync
         run: ./social_distancing.sh
-
-      - name: Sync Monthly Patterns ...
-        working-directory: _sync
-        run: ./monthly_patterns.sh
 
       - name: Sync Weekly Patterns ...
         working-directory: _sync
