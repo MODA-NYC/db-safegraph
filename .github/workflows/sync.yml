@@ -41,3 +41,7 @@ jobs:
       - name: Sync Weekly Patterns ...
         working-directory: _sync
         run: ./weekly_patterns.sh
+
+      - name: Repair Tables ...
+        working-directory: _sync
+        run: python3 repair_tables.py
