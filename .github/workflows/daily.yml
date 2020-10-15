@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [daily]
   schedule:
-    - cron: 0 0 * * *
+    - cron: 0 1 * * *
 
 jobs: 
   Sync:
@@ -25,23 +25,19 @@ jobs:
           sudo mv ./mc /usr/bin
           mc config host add sg $SG_S3_ENDPOINT $SG_ACCESS_KEY_ID $SG_SECRET_ACCESS_KEY --api S3v4
           mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
+          pip3 install -r requirements.txt
 
       - name: Update daily_borough_poivisits_by_sector ...
-        working-directory: recipes
         run: ./sg run --name daily_borough_poivisits_by_sector
       
       - name: Update daily_borough_poivisits_by_subsector ...
-        working-directory: recipes
         run: ./sg run --name daily_borough_poivisits_by_subsector
 
       - name: Update daily_nyc_poivisits ...
-        working-directory: recipe
         run: ./sg run --name daily_nyc_poivisits
 
       - name: Update daily_zip_poivisits_by_sector ...
-        working-directory: recipes
         run: ./sg run --name daily_zip_poivisits_by_sector
       
       - name: Update daily_zip_poivisits_by_subsector ...
-        working-directory: recipes
         run: ./sg run --name daily_zip_poivisits_by_subsector
