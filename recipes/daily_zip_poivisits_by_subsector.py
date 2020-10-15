@@ -1,5 +1,6 @@
 from _helper import aws
 from _helper.quarters import PastQs, get_quarter
+from _helper.poi import poi_latest_date
 import sys
 
 """
@@ -76,7 +77,7 @@ FROM daily_visits a
 LEFT JOIN (
       SELECT distinct safegraph_place_id, naics_code, top_category, sub_category
       FROM "safegraph"."core_poi"
-      WHERE region = 'NY'
+      WHERE region = 'NY' AND dt = CAST('{2}' AS DATE)
     ) b  
     ON a.safegraph_place_id=b.safegraph_place_id
 GROUP BY a.date_current,
@@ -95,7 +96,7 @@ for year_qrtr, range in quarters.items():
     end = range[1]
     print(year_qrtr, start, end) 
     aws.execute_query(
-        query=query.format(start, end), 
+        query=query.format(start, end, poi_latest_date), 
         database="safegraph", 
         output=f"output/poi/daily_zip_poivisits_by_subsector/daily_zip_poivisits_by_subsector_{year_qrtr}.csv.zip"
     )
