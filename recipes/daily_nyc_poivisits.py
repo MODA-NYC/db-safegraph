@@ -1,4 +1,7 @@
 from _helper import aws
+import sys
+from math import ceil
+import datetime
 
 """
 DESCRIPTION:
@@ -7,7 +10,7 @@ DESCRIPTION:
    per day. It only includes POIs within NYC.
 
 INPUTS:
-    safegraph.monthly_patterns (
+    safegraph.weekly_patterns (
         safegraph_place_id text,
         location_name text, 
         poi_cbg text,
@@ -51,8 +54,10 @@ FROM (
      CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
      CAST(SUBSTR(date_range_end, 1, 10) AS DATE) as date_end,
      cast(json_parse(visits_by_day) as array<varchar>) as a
-  FROM safegraph.monthly_patterns
+  FROM safegraph.weekly_patterns
   WHERE SUBSTR(poi_cbg,1,5) IN ('36085','36081','36061','36047','36005')
+  AND CAST('{0}' AS DATE) < dt
+  AND CAST('{1}' AS DATE) > dt
 ) b
 CROSS JOIN UNNEST(a) as t(visits)
 )
@@ -74,9 +79,28 @@ LEFT JOIN (
     ) b  
     ON a.safegraph_place_id=b.safegraph_place_id
 """
+'''
+# Load the current quarter
+today = datetime.date.today()
+year_qrtr = str(today.year) + 'Q' + str(ceil(today.month/3.))
+start = datetime.date(today.year, 3*ceil(today.month/3.) - 2, 1)
+quarters = {year_qrtr:(str(start), str(today))}
 
-aws.execute_query(
-    query=query, 
-    database="safegraph", 
-    output="output/poi/daily_nyc_poivisits.csv"
-)
+'''
+quarters = {'2019Q1':('2019-01-01', '2019-03-31'),
+            '2019Q2':('2019-04-01', '2019-06-30'), 
+            '2019Q3':('2019-07-01', '2019-09-30'),
+            '2019Q4':('2019-10-01', '2019-12-31'),
+            '2020Q1':('2020-01-01', '2020-03-31'),
+            '2020Q2':('2020-04-01', '2020-06-30'), 
+            '2020Q3':('2020-07-01', '2020-09-30')}
+
+for year_qrtr, range in quarters.items():
+    start = range[0]
+    end = range[1]
+    print(year_qrtr, start, end) 
+    aws.execute_query(
+        query=query.format(start, end), 
+        database="safegraph", 
+        output=f"output/poi/daily_nyc_poivisits/daily_nyc_poivisits_{year_qrtr}.csv"
+    )
