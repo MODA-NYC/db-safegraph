@@ -1,0 +1,31 @@
+name: Update weekly tables
+
+on:
+  repository_dispatch:
+    types: [weekly]
+  schedule:
+    - cron: 0 1 * * 1
+
+jobs: 
+  Sync:
+    runs-on: ubuntu-latest
+    env:
+      RDP_S3_ENDPOINT: https://s3.amazonaws.com 
+      RDP_ACCESS_KEY_ID: ${{ secrets.RDP_ACCESS_KEY_ID }}
+      RDP_SECRET_ACCESS_KEY: ${{ secrets.RDP_SECRET_ACCESS_KEY }}
+      AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies ...
+        run: pip3 install -r requirements.txt
+
+      - name: Update weekly_county_trips ...
+        run: ./sg run --name weekly_county_trips
+      
+      - name: Update weekly_state_trips ...
+        run: ./sg run --name weekly_state_trips
+
+      - name: Update weekly_nyc_poivisits ...
+        run: ./sg run --name weekly_nyc_poivisits
