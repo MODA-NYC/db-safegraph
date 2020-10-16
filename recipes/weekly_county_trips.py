@@ -54,9 +54,9 @@ GROUP BY EXTRACT(year from date_start),
 """
 
 # Load the current quarter
-# quarters = get_quarter()
+quarters = get_quarter()
 
-quarters = PastQs
+# quarters = PastQs
 
 for year_qrtr, range in quarters.items():
     start = range[0]
