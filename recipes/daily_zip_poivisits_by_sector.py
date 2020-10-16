@@ -33,7 +33,8 @@ OUTPUTS:
         borocode int,
         zipcode varchar(5),
         fips_county varchar(5),
-        sector varchar(2)
+        sector varchar(2),
+        total_visits int
     )
 """
 

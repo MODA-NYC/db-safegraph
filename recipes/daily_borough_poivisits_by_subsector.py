@@ -31,7 +31,8 @@ OUTPUTS:
         borough text, 
         borocode int,
         fips_county varchar(5),
-        subsector varchar(3)
+        subsector varchar(3),
+        total_visits int
     )
 """
 
