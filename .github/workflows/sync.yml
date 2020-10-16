@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: install dependencies ...
         run: |
+          pip3 install -r requirements.txt
           curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
           chmod +x mc
           sudo mv ./mc /usr/bin
