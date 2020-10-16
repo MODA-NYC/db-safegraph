@@ -109,5 +109,5 @@ query ="""
 aws.execute_query(
         query=query, 
         database="safegraph", 
-        output=f"output/social_distancing/weekly_state_trips/device_counts_by_state.csv.zip"
+        output="output/social_distancing/device_counts_by_state.csv.zip"
     )
