@@ -84,3 +84,30 @@ for year_qrtr, range in quarters.items():
         database="safegraph", 
         output=f"output/social_distancing/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
     )
+
+# Add/update device count table for states and NYC
+query ="""
+    SELECT 
+        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        SUBSTR(origin_census_block_group, 1, 2) as state,
+        SUM(CAST(device_count AS INTEGER)) as device_count,
+        SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count
+    FROM social_distancing
+    WHERE SUBSTR(origin_census_block_group, 1, 5) NOT IN ('36085','36081','36061','36047','36005')
+    GROUP BY date_range_start, SUBSTR(origin_census_block_group, 1, 2)
+    UNION
+    SELECT 
+        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        'NYC' as state,
+        SUM(CAST(device_count AS INTEGER)) as device_count,
+        SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count
+    FROM social_distancing
+    WHERE SUBSTR(origin_census_block_group, 1, 5) IN ('36085','36081','36061','36047','36005')
+    GROUP BY date_range_start
+"""
+
+aws.execute_query(
+        query=query, 
+        database="safegraph", 
+        output=f"output/social_distancing/weekly_state_trips/device_counts_by_state.csv.zip"
+    )
