@@ -39,7 +39,7 @@ OUTPUTS:
         naics_code varchar(6),
         visits_weekday int,
         visits_weekend int,
-        visits_daily int,
+        visits_total int,
         latitude numeric,
         longitude numeric
     )
@@ -72,7 +72,7 @@ SELECT
    b.naics_code,
    SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
    SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
-   SUM(a.visits) as visits_daily,
+   SUM(a.visits) as visits_total,
    b.latitude,
    b.longitude
 FROM daily_visits a
