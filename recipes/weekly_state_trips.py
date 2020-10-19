@@ -82,19 +82,20 @@ quarters = get_quarter()
 
 # quarters = PastQs
 
-for year_qrtr, range in quarters.items():
-    start = range[0]
-    end = range[1]
-    print(year_qrtr, start, end) 
-    aws.execute_query(
-        query=query.format(start, end), 
-        database="safegraph", 
-        output=f"output/social_distancing/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
-    )
+# for year_qrtr, range in quarters.items():
+#     start = range[0]
+#     end = range[1]
+#     print(year_qrtr, start, end) 
+#     aws.execute_query(
+#         query=query.format(start, end), 
+#         database="safegraph", 
+#         output=f"output/social_distancing/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
+#     )
 
 # Add/update device count table for states and NYC
 query ="""
     SELECT 
+        SUBSTR(date_range_start, 1, 10) as date,
         CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
             LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         SUBSTR(origin_census_block_group, 1, 2) as state,
@@ -105,6 +106,7 @@ query ="""
     GROUP BY date_range_start, SUBSTR(origin_census_block_group, 1, 2)
     UNION
     SELECT 
+        SUBSTR(date_range_start, 1, 10) as date,
         CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
             LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         'NYC' as state,
