@@ -115,8 +115,8 @@ query ="""
     GROUP BY date_range_start
 """
 
-# aws.execute_query(
-#         query=query, 
-#         database="safegraph", 
-#         output="output/social_distancing/device_counts_by_state.csv.zip"
-#     )
+aws.execute_query(
+        query=query, 
+        database="safegraph", 
+        output="output/social_distancing/device_counts_by_state.csv.zip"
+    )
