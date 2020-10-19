@@ -15,59 +15,66 @@ INPUTS:
     )
 
 OUTPUTS:
-    outputs/weekly_county_trips (
+    outputs/weekly_state_trips (
         year_week text,
-        state varchar(2),
-        to_nyc int,
-        from_nyc int,
-        net_nyc int
+        origin varchar(3),
+        destination varchar(3),
+        weekday_trips int,
+        weekend_trips int,
+        all_trips int
     )
 """
 
 query = """
 WITH dataset AS (
-  SELECT date_start, origin_census_block_group, map_keys(a) as cbg, a from (
-     SELECT origin_census_block_group,
+    SELECT 
+        date_start, 
+        origin_census_block_group, 
+        map_keys(a) as cbg, a 
+    FROM (
+        SELECT origin_census_block_group,
             CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
             CAST(json_parse(destination_cbgs) AS  map<varchar, varchar>) as a 
-     FROM social_distancing
-     WHERE CAST('{0}' AS DATE) < dt
-     AND CAST('{1}' AS DATE) > dt) b
+        FROM social_distancing
+        WHERE CAST('{0}' AS DATE) < dt
+        AND CAST('{1}' AS DATE) > dt
+    ) b
  ),
- 
- pairs AS (
- SELECT 
-     CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
-     (CASE WHEN SUBSTR(origin_census_block_group, 1, 5) IN ('36085','36081','36061','36047','36005')
-           THEN 'NYC'
-      ELSE SUBSTR(origin_census_block_group, 1, 2)
-      END) as origin,
-     (CASE WHEN SUBSTR(desti_cbgs, 1, 5) IN ('36085','36081','36061','36047','36005')
-           THEN 'NYC'
-      ELSE SUBSTR(desti_cbgs, 1, 2)
-      END) as destination,
-      CAST(a[desti_cbgs] as SMALLINT) as trips
- FROM dataset
- CROSS JOIN unnest(cbg) t(desti_cbgs)
- WHERE SUBSTR(desti_cbgs, 1, 5) IN ('36085','36081','36061','36047','36005')
-    OR SUBSTR(origin_census_block_group, 1, 5) IN ('36085','36081','36061','36047','36005')
- ),
-          
- state_pairs AS (
- SELECT year_week, origin, destination, SUM(trips) as trips
- FROM pairs
- GROUP BY year_week, origin, destination)
-
-SELECT
-   a.year_week,
-   a.origin as state,
-   a.trips as to_nyc,
-   b.trips as from_nyc,
-   a.trips - b.trips as net_nyc
-   FROM state_pairs a
-   JOIN state_pairs b
-   ON a.origin=b.destination
-   WHERE a.origin <> 'NYC'
+draft as (
+    SELECT 
+        CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||
+            LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
+        (CASE 
+            WHEN SUBSTR(origin_census_block_group, 1, 5) 
+                IN ('36085','36081','36061','36047','36005') THEN 'NYC'
+            ELSE SUBSTR(origin_census_block_group, 1, 2)
+        END) as origin,
+        (CASE 
+            WHEN SUBSTR(desti_cbgs, 1, 5) 
+                IN ('36085','36081','36061','36047','36005') THEN 'NYC'
+            ELSE SUBSTR(desti_cbgs, 1, 2)
+        END) as destination,
+        (CASE 
+            WHEN EXTRACT(dow from date_start) NOT IN (0, 6) 
+            THEN CAST(a[desti_cbgs] as SMALLINT) 
+        END) as weekday_trips,
+        (CASE 
+            WHEN EXTRACT(dow from date_start) IN (0, 6) 
+            THEN CAST(a[desti_cbgs] as SMALLINT) 
+        END) as weekend_trips,
+        CAST(a[desti_cbgs] as SMALLINT) as all_trips
+    FROM dataset
+    CROSS JOIN unnest(cbg) t(desti_cbgs)
+    WHERE SUBSTR(desti_cbgs, 1, 5) IN ('36085','36081','36061','36047','36005')
+        OR SUBSTR(origin_census_block_group, 1, 5) IN ('36085','36081','36061','36047','36005')
+)
+SELECT 
+    year_week, origin, destination,
+    SUM(weekday_trips) as weekday_trips,
+    SUM(weekend_trips) as weekend_trips,
+    SUM(all_trips) as all_trips
+FROM draft
+GROUP BY year_week, origin, destination
 """
 
 # Load the current quarter
@@ -88,7 +95,8 @@ for year_qrtr, range in quarters.items():
 # Add/update device count table for states and NYC
 query ="""
     SELECT 
-        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
+            LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         SUBSTR(origin_census_block_group, 1, 2) as state,
         SUM(CAST(device_count AS INTEGER)) as device_count,
         SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count
@@ -97,7 +105,8 @@ query ="""
     GROUP BY date_range_start, SUBSTR(origin_census_block_group, 1, 2)
     UNION
     SELECT 
-        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
+            LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         'NYC' as state,
         SUM(CAST(device_count AS INTEGER)) as device_count,
         SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count
@@ -106,8 +115,8 @@ query ="""
     GROUP BY date_range_start
 """
 
-aws.execute_query(
-        query=query, 
-        database="safegraph", 
-        output="output/social_distancing/device_counts_by_state.csv.zip"
-    )
+# aws.execute_query(
+#         query=query, 
+#         database="safegraph", 
+#         output="output/social_distancing/device_counts_by_state.csv.zip"
+#     )
