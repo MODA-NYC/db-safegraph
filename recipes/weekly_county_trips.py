@@ -67,3 +67,20 @@ for year_qrtr, range in quarters.items():
         database="safegraph", 
         output=f"output/social_distancing/weekly_county_trips/weekly_county_trips_{year_qrtr}.csv.zip"
     )
+
+# Add/update device count table for counties in 8-state region
+query ="""
+    SELECT 
+        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        SUBSTR(origin_census_block_group, 1, 5) as origin_fips,
+        SUM(CAST(device_count AS INTEGER)) as device_count,
+        SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count
+    FROM social_distancing
+    WHERE SUBSTR(origin_census_block_group, 1, 2) IN ('36', '34', '09', '42', '25', '44', '50', '33')
+    GROUP BY date_range_start, SUBSTR(origin_census_block_group, 1, 5)
+"""
+aws.execute_query(
+        query=query, 
+        database="safegraph", 
+        output="output/social_distancing/device_counts_by_county.csv.zip"
+    )
