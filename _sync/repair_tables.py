@@ -3,17 +3,10 @@ sys.path.append('../')
 from recipes._helper import aws
 
 
-query = 'MSCK REPAIR TABLE weekly_patterns;'
-aws.start_query(
-        query=query, 
-        database="safegraph")
+def msck_repair(tablename:str, database:str='safegraph'):
+        return aws.start_query(query=f'MSCK REPAIR TABLE {tablename};', database=database)
 
-query = 'MSCK REPAIR TABLE core_poi;'
-aws.start_query(
-        query=query, 
-        database="safegraph")
-        
-query = 'MSCK REPAIR TABLE social_distancing;'
-aws.start_query(
-        query=query, 
-        database="safegraph")
+msck_repair('core_poi') 
+msck_repair('social_distancing')
+msck_repair('weekly_patterns') 
+msck_repair('geo_supplement')
