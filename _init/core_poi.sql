@@ -1,5 +1,6 @@
 CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi 
 (
+  `placekey` string,
   `safegraph_place_id` string,
   `parent_safegraph_place_id` string,
   `location_name` string,
