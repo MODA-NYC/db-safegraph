@@ -90,6 +90,7 @@ GROUP BY EXTRACT(year from a.date_current),
          b.street_address,
          b.latitude,
          b.longitude
+ORDER BY year_week, poi_cbg
 """
 
 # Load the current quarter

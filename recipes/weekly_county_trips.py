@@ -51,6 +51,7 @@ GROUP BY EXTRACT(year from date_start),
         EXTRACT(week from date_start),
         SUBSTR(origin_census_block_group, 1, 5),
         SUBSTR(desti_cbgs, 1, 5)
+ORDER BY year_week, fips_county_origin, fips_county_destination
 """
 
 # Load the current quarter

@@ -78,6 +78,7 @@ LEFT JOIN (
       WHERE region = 'NY' AND dt = CAST('{2}' AS DATE)
     ) b  
     ON a.safegraph_place_id=b.safegraph_place_id
+ORDER BY date, poi_cbg
 """
 
 # Load the current quarter
