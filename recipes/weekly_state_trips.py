@@ -75,6 +75,7 @@ SELECT
     SUM(all_trips) as all_trips
 FROM draft
 GROUP BY year_week, origin, destination
+ORDER BY year_week, origin, destination
 """
 
 # Load the current quarter

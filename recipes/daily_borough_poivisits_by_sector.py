@@ -81,6 +81,7 @@ query = """
     GROUP BY a.date_current,
             SUBSTR(a.poi_cbg,1,5),
             SUBSTR(b.naics_code,1,2)
+    ORDER BY date, borocode
     """
     
 # Load the current quarter

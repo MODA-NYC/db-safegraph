@@ -85,6 +85,7 @@ GROUP BY a.date_current,
          SUBSTR(a.poi_cbg,1,5),
          a.postal_code,
          SUBSTR(b.naics_code,1,3)
+ORDER BY date, borocode, zipcode
 """
 
 # Load the current quarter
