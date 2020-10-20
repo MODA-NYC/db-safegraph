@@ -1,5 +1,6 @@
 # db-safegraph
-SafeGraph ETL
+
+> Note: if you are a data user, checkout our sample notebooks under [`examples`](https://github.com/NYCPlanning/db-safegraph/tree/master/examples). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NYCPlanning/db-safegraph/blob/master/examples/examples.ipynb)
 
 ## Instructions
 1. Install dependencies
