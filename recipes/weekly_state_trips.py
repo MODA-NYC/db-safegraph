@@ -82,15 +82,15 @@ quarters = get_quarter()
 
 # quarters = PastQs
 
-# for year_qrtr, range in quarters.items():
-#     start = range[0]
-#     end = range[1]
-#     print(year_qrtr, start, end) 
-#     aws.execute_query(
-#         query=query.format(start, end), 
-#         database="safegraph", 
-#         output=f"output/social_distancing/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
-#     )
+for year_qrtr, range in quarters.items():
+    start = range[0]
+    end = range[1]
+    print(year_qrtr, start, end) 
+    aws.execute_query(
+        query=query.format(start, end), 
+        database="safegraph", 
+        output=f"output/social_distancing/weekly_state_trips/weekly_state_trips_{year_qrtr}.csv.zip"
+    )
 
 # Add/update device count table for states and NYC
 query ="""
