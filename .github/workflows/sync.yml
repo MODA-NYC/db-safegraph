@@ -40,6 +40,10 @@ jobs:
       - name: Sync Weekly Patterns ...
         working-directory: _sync
         run: ./weekly_patterns.sh
+      
+      - name: Sync GeoSupplement ...
+        working-directory: _sync
+        run: ./geo_supplement.sh
 
       - name: Repair Tables ...
         working-directory: _sync
