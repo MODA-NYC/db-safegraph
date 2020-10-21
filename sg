@@ -81,7 +81,7 @@ def sync(
     """
     command = f'''
     {env}
-    ./{name}.sh
+    (cd _sync && ./{name}.sh)
     '''
     os.system(command)
 
