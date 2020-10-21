@@ -70,8 +70,19 @@ do
                 echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
             ;;
             error)
-                # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH_NEW/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
+                mkdir -p tmp
+                mc cp $SG_BASEPATH_NEW/$KEY tmp/$FILENAME
+                (
+                    # Remove placekey, effective after 2020 october
+                    cd tmp
+                    gunzip $FILENAME
+                    CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+                    cut -f1 -d, --complement $CSVNAME > _$CSVNAME
+                    rm $CSVNAME
+                    gzip _$CSVNAME
+                )
+                mc cp tmp/_$FILENAME $RDP_BASEPATH/$PARTITION/$NEW_KEY
+                rm tmp/_$FILENAME
             ;;
             esac
         else echo "ignore $FILENAME"
