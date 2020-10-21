@@ -40,7 +40,6 @@ jobs:
         run: ./sg sync --name weekly_patterns
       
       - name: Sync GeoSupplement ...
-        working-directory: _sync
         run: ./sg sync --name geo_supplement
 
       - name: Repair Tables ...
