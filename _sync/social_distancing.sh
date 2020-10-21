@@ -41,7 +41,6 @@ do
             mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$FILENAME
         ;;
         esac
-        break
     ) &
 done;
 
