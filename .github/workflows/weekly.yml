@@ -29,3 +29,6 @@ jobs:
 
       - name: Update weekly_nyc_poivisits ...
         run: ./sg run --name weekly_nyc_poivisits
+
+      - name: Update daily_home_panel_summary ...
+        run: ./sg run --name daily_home_panel_summary
