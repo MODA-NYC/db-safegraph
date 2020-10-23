@@ -96,7 +96,8 @@ FROM (
     SELECT 
         a.safegraph_place_id, a.naics_code, 
         a.top_category, a.sub_category,
-        a.latitude, a.longitude,
+        a.latitude, a.longitude, 
+        a.street_address as address,
         b.area_square_feet, b.includes_parking_lot, b.is_synthetic
     FROM "safegraph"."core_poi" a
     LEFT JOIN "safegraph"."geo_supplement" b
@@ -129,15 +130,15 @@ for year_qrtr, range in quarters.items():
         output=f"output/ops/{tablename1}/{tablename1}_{year_qrtr}.csv.zip"
     )
     # weekly_nyc_poivisits_by_visitor_home_cbg
-    # aws.execute_query(
-    #     query=query2.format(start, end), 
-    #     database="safegraph", 
-    #     output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
-    # )
+    aws.execute_query(
+        query=query2.format(start, end), 
+        database="safegraph", 
+        output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
+    )
     
 # poi_info
-# aws.execute_query(
-#         query=query3.format(poi_latest_date, geo_latest_date),
-#         database="safegraph",
-#         output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
-#     )
+aws.execute_query(
+        query=query3.format(poi_latest_date, geo_latest_date),
+        database="safegraph",
+        output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
+    )
