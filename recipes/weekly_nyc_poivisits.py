@@ -70,8 +70,8 @@ SELECT
    b.street_address as address,
    a.poi_cbg,
    b.naics_code,
-   SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
-   SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
+   SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (1, 7) THEN visits END) as visits_weekday,
+   SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (1, 7) THEN visits END) as visits_weekend,
    SUM(a.visits) as visits_total,
    b.latitude,
    b.longitude
