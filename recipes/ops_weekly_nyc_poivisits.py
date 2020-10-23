@@ -8,7 +8,7 @@ WITH
 daily_visits AS(
     SELECT 
         safegraph_place_id, 
-        location_name, poi_cbg,
+        location_name, poi_cbg, visitors_total, max_visits_per_day, min_visits_per_day, max_visits_per_hour, min_visits_per_hour,
         date_add('day', row_number() over(partition by safegraph_place_id), date_start) AS date_current, 
         CAST(visits AS SMALLINT) as visits
     FROM (
@@ -18,6 +18,11 @@ daily_visits AS(
         poi_cbg,
         CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
         CAST(SUBSTR(date_range_end, 1, 10) AS DATE) as date_end,
+        raw_visitor_counts as visitors_total,
+        array_max(cast(json_parse(visits_by_day) as array<varchar>)) as max_visits_per_day,
+        array_min(cast(json_parse(visits_by_day) as array<varchar>)) as min_visits_per_day,
+        array_max(cast(json_parse(visits_by_each_hour) as array<varchar>)) as max_visits_per_hour,
+        array_min(cast(json_parse(visits_by_each_hour) as array<varchar>)) as min_visits_per_hour,
         cast(json_parse(visits_by_day) as array<varchar>) as a
     FROM safegraph.weekly_patterns
     WHERE SUBSTR(poi_cbg,1,5) IN ('36085','36081','36061','36047','36005')
@@ -34,11 +39,17 @@ SELECT
     a.poi_cbg,
     SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
     SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
-    SUM(a.visits) as visits_total
+    SUM(a.visits) as visits_total,
+    a.visitors_total,
+    a.max_visits_per_day,
+    a.min_visits_per_day,
+    a.max_visits_per_hour,
+    a.min_visits_per_hour
 FROM daily_visits a
 GROUP BY 
     a.safegraph_place_id, EXTRACT(year from a.date_current), 
-    EXTRACT(week from a.date_current), a.location_name, a.poi_cbg
+    EXTRACT(week from a.date_current), a.location_name, a.poi_cbg, a.max_visits_per_day,
+    a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visitors_total
 ORDER BY year_week, poi_cbg
 """
 
@@ -118,15 +129,15 @@ for year_qrtr, range in quarters.items():
         output=f"output/ops/{tablename1}/{tablename1}_{year_qrtr}.csv.zip"
     )
     # weekly_nyc_poivisits_by_visitor_home_cbg
-    aws.execute_query(
-        query=query2.format(start, end), 
-        database="safegraph", 
-        output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
-    )
+    # aws.execute_query(
+    #     query=query2.format(start, end), 
+    #     database="safegraph", 
+    #     output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
+    # )
     
 # poi_info
-aws.execute_query(
-        query=query3.format(poi_latest_date, geo_latest_date),
-        database="safegraph",
-        output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
-    )
+# aws.execute_query(
+#         query=query3.format(poi_latest_date, geo_latest_date),
+#         database="safegraph",
+#         output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
+#     )
