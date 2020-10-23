@@ -55,11 +55,11 @@ draft as (
             ELSE SUBSTR(desti_cbgs, 1, 2)
         END) as destination,
         (CASE 
-            WHEN EXTRACT(dow from date_start) NOT IN (0, 6) 
+            WHEN EXTRACT(dow from date_start) NOT IN (1, 7) 
             THEN CAST(a[desti_cbgs] as SMALLINT) 
         END) as weekday_trips,
         (CASE 
-            WHEN EXTRACT(dow from date_start) IN (0, 6) 
+            WHEN EXTRACT(dow from date_start) IN (1, 7) 
             THEN CAST(a[desti_cbgs] as SMALLINT) 
         END) as weekend_trips,
         CAST(a[desti_cbgs] as SMALLINT) as all_trips

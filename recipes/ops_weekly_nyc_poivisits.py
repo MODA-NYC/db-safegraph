@@ -32,8 +32,8 @@ SELECT
         LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
     a.location_name as poi,
     a.poi_cbg,
-    SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
-    SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
+    SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (1, 7) THEN visits END) as visits_weekday,
+    SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (1, 7) THEN visits END) as visits_weekend,
     SUM(a.visits) as visits_total
 FROM daily_visits a
 GROUP BY 
