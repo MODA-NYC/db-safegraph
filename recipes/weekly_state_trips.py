@@ -42,7 +42,7 @@ WITH dataset AS (
  ),
 draft as (
     SELECT 
-        CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||
+        CAST(EXTRACT(year_of_week from date_start) AS VARCHAR)||'-'||
             LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
         (CASE 
             WHEN SUBSTR(origin_census_block_group, 1, 5) 
@@ -97,7 +97,7 @@ for year_qrtr, range in quarters.items():
 query ="""
     SELECT 
         SUBSTR(date_range_start, 1, 10) as date,
-        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
+        CAST(EXTRACT(year_of_week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
             LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         SUBSTR(origin_census_block_group, 1, 2) as state,
         SUM(CAST(device_count AS INTEGER)) as device_count,
@@ -108,7 +108,7 @@ query ="""
     UNION
     SELECT 
         SUBSTR(date_range_start, 1, 10) as date,
-        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
+        CAST(EXTRACT(year_of_week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||
             LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         'NYC' as state,
         SUM(CAST(device_count AS INTEGER)) as device_count,

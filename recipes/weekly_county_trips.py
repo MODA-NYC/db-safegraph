@@ -38,7 +38,7 @@ SELECT date_start, origin_census_block_group, map_keys(a) as cbg, a from (
     ) b
 ) 
 SELECT 
-    CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
+    CAST(EXTRACT(year_of_week from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
     SUBSTR(origin_census_block_group, 1, 5) as fips_county_origin,
     SUBSTR(desti_cbgs, 1, 5) as fips_county_destination,
     SUM(CASE WHEN EXTRACT(dow from date_start) NOT IN (1, 7) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekday_trips,
@@ -47,7 +47,7 @@ SELECT
 FROM dataset
 CROSS JOIN unnest(cbg) t(desti_cbgs)
 WHERE SUBSTR(desti_cbgs, 1, 2) IN ('36', '34', '09', '42', '25', '44', '50', '33')
-GROUP BY EXTRACT(year from date_start),
+GROUP BY EXTRACT(year_of_week from date_start),
         EXTRACT(week from date_start),
         SUBSTR(origin_census_block_group, 1, 5),
         SUBSTR(desti_cbgs, 1, 5)
@@ -72,7 +72,7 @@ for year_qrtr, range in quarters.items():
 # Add/update device count table for counties in 8-state region
 query ="""
     SELECT 
-        CAST(EXTRACT(year from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
+        CAST(EXTRACT(year_of_week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from CAST(SUBSTR(date_range_start, 1, 10) AS DATE)) AS VARCHAR),2,'0') as year_week,
         SUBSTR(origin_census_block_group, 1, 5) as origin_fips,
         SUM(CAST(device_count AS INTEGER)) as device_count,
         SUM(CAST(completely_home_device_count AS INTEGER)) as completely_home_device_count

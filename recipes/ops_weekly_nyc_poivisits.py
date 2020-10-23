@@ -28,7 +28,7 @@ daily_visits AS(
 )
 SELECT
     a.safegraph_place_id,
-    CAST(EXTRACT(year from a.date_current) AS VARCHAR)||'-'||
+    CAST(EXTRACT(year_of_week from a.date_current) AS VARCHAR)||'-'||
         LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
     a.location_name as poi,
     a.poi_cbg,
@@ -37,7 +37,7 @@ SELECT
     SUM(a.visits) as visits_total
 FROM daily_visits a
 GROUP BY 
-    a.safegraph_place_id, EXTRACT(year from a.date_current), 
+    a.safegraph_place_id, EXTRACT(year_of_week from a.date_current), 
     EXTRACT(week from a.date_current), a.location_name, a.poi_cbg
 ORDER BY year_week, poi_cbg
 """
@@ -63,7 +63,7 @@ WITH dataset AS(
     ) b
 )
 SELECT 
-    CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||
+    CAST(EXTRACT(year_of_week from date_start) AS VARCHAR)||'-'||
         LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
     a.location_name as poi,
     a.poi_cbg,
