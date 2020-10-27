@@ -134,16 +134,16 @@ for year_qrtr, range in quarters.items():
         database="safegraph", 
         output=f"output/ops/{tablename1}/{tablename1}_{year_qrtr}.csv.zip"
     )
-#     # weekly_nyc_poivisits_by_visitor_home_cbg
-#     aws.execute_query(
-#         query=query2.format(start, end), 
-#         database="safegraph", 
-#         output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
-#     )
+    # weekly_nyc_poivisits_by_visitor_home_cbg
+    aws.execute_query(
+        query=query2.format(start, end), 
+        database="safegraph", 
+        output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
+    )
     
-# # poi_info
-# aws.execute_query(
-#         query=query3.format(poi_latest_date, geo_latest_date),
-#         database="safegraph",
-#         output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
-#     )
+# poi_info
+aws.execute_query(
+        query=query3.format(poi_latest_date, geo_latest_date),
+        database="safegraph",
+        output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
+    )
