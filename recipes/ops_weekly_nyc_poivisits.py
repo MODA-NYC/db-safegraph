@@ -8,9 +8,11 @@ WITH
 daily_visits AS(
     SELECT 
         safegraph_place_id, 
-        location_name, poi_cbg, visitors_total, max_visits_per_day, min_visits_per_day, max_visits_per_hour, min_visits_per_hour,
+        location_name, poi_cbg, visitors_total, 
+        max_visits_per_day, min_visits_per_day, 
+        max_visits_per_hour, min_visits_per_hour,
         date_add('day', row_number() over(partition by safegraph_place_id), date_start) AS date_current, 
-        CAST(visits AS SMALLINT) as visits
+        CAST(visits AS SMALLINT) as visits, median_dwell
     FROM (
     SELECT
         safegraph_place_id,
@@ -23,7 +25,8 @@ daily_visits AS(
         array_min(cast(json_parse(visits_by_day) as array<varchar>)) as min_visits_per_day,
         array_max(cast(json_parse(visits_by_each_hour) as array<varchar>)) as max_visits_per_hour,
         array_min(cast(json_parse(visits_by_each_hour) as array<varchar>)) as min_visits_per_hour,
-        cast(json_parse(visits_by_day) as array<varchar>) as a
+        cast(json_parse(visits_by_day) as array<varchar>) as a,
+        median_dwell
     FROM safegraph.weekly_patterns
     WHERE SUBSTR(poi_cbg,1,5) IN ('36085','36081','36061','36047','36005')
     AND CAST('{0}' AS DATE) < dt
@@ -44,12 +47,14 @@ SELECT
     a.max_visits_per_day,
     a.min_visits_per_day,
     a.max_visits_per_hour,
-    a.min_visits_per_hour
+    a.min_visits_per_hour,
+    a.median_dwell
 FROM daily_visits a
 GROUP BY 
     a.safegraph_place_id, EXTRACT(year from a.date_current), 
     EXTRACT(week from a.date_current), a.location_name, a.poi_cbg, a.max_visits_per_day,
-    a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visitors_total
+    a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visitors_total,
+    a.median_dwell
 ORDER BY year_week, poi_cbg
 """
 
@@ -129,16 +134,16 @@ for year_qrtr, range in quarters.items():
         database="safegraph", 
         output=f"output/ops/{tablename1}/{tablename1}_{year_qrtr}.csv.zip"
     )
-    # weekly_nyc_poivisits_by_visitor_home_cbg
-    aws.execute_query(
-        query=query2.format(start, end), 
-        database="safegraph", 
-        output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
-    )
+#     # weekly_nyc_poivisits_by_visitor_home_cbg
+#     aws.execute_query(
+#         query=query2.format(start, end), 
+#         database="safegraph", 
+#         output=f"output/ops/{tablename2}/{tablename2}_{year_qrtr}.csv.zip"
+#     )
     
-# poi_info
-aws.execute_query(
-        query=query3.format(poi_latest_date, geo_latest_date),
-        database="safegraph",
-        output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
-    )
+# # poi_info
+# aws.execute_query(
+#         query=query3.format(poi_latest_date, geo_latest_date),
+#         database="safegraph",
+#         output=f"output/ops/{tablename3}/{tablename3}.csv.zip"
+#     )
