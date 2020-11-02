@@ -65,13 +65,13 @@ CROSS JOIN UNNEST(a) as t(visits)
 )
 
 SELECT
-   CAST(EXTRACT(year from a.date_current) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
+   CAST(EXTRACT(year_of_week from a.date_current) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
    a.location_name as poi,
    b.street_address as address,
    a.poi_cbg,
    b.naics_code,
-   SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
-   SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
+   SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (1, 7) THEN visits END) as visits_weekday,
+   SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (1, 7) THEN visits END) as visits_weekend,
    SUM(a.visits) as visits_total,
    b.latitude,
    b.longitude
@@ -82,7 +82,7 @@ LEFT JOIN (
       WHERE region = 'NY' AND dt = CAST('{2}' AS DATE)
     ) b  
     ON a.safegraph_place_id=b.safegraph_place_id
-GROUP BY EXTRACT(year from a.date_current), 
+GROUP BY EXTRACT(year_of_week from a.date_current), 
          EXTRACT(week from a.date_current), 
          a.location_name, 
          b.naics_code,

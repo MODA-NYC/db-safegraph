@@ -31,16 +31,18 @@ jobs:
           mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
 
       - name: Sync Core POI ...
-        working-directory: _sync
-        run: ./core_poi.sh
+        run: ./sg sync --name core_poi
       
       - name: Sync Social Distancing ...
-        working-directory: _sync
-        run: ./social_distancing.sh
+        run: ./sg sync --name social_distancing
 
-      - name: Sync Weekly Patterns ...
-        working-directory: _sync
-        run: ./weekly_patterns.sh
+      - name: Sync Weekly Patterns and Home Panel Summary ...
+        run: |
+          ./sg sync --name weekly_patterns
+          ./sg sync --name home_panel_summary
+      
+      - name: Sync GeoSupplement ...
+        run: ./sg sync --name geo_supplement
 
       - name: Repair Tables ...
         working-directory: _sync

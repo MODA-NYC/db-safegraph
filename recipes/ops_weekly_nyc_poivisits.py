@@ -36,12 +36,12 @@ daily_visits AS(
 )
 SELECT
     a.safegraph_place_id,
-    CAST(EXTRACT(year from a.date_current) AS VARCHAR)||'-'||
+    CAST(EXTRACT(year_of_week from a.date_current) AS VARCHAR)||'-'||
         LPAD(CAST(EXTRACT(week from a.date_current) AS VARCHAR),2,'0') as year_week,
     a.location_name as poi,
     a.poi_cbg,
-    SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (0, 6) THEN visits END) as visits_weekday,
-    SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (0, 6) THEN visits END) as visits_weekend,
+    SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (1, 7) THEN visits END) as visits_weekday,
+    SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (1, 7) THEN visits END) as visits_weekend,
     SUM(a.visits) as visits_total,
     a.visitors_total,
     a.max_visits_per_day,
@@ -51,7 +51,7 @@ SELECT
     a.median_dwell
 FROM daily_visits a
 GROUP BY 
-    a.safegraph_place_id, EXTRACT(year from a.date_current), 
+    a.safegraph_place_id, EXTRACT(year_of_week from a.date_current), 
     EXTRACT(week from a.date_current), a.location_name, a.poi_cbg, a.max_visits_per_day,
     a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visitors_total,
     a.median_dwell
@@ -79,7 +79,7 @@ WITH dataset AS(
     ) b
 )
 SELECT 
-    CAST(EXTRACT(year from date_start) AS VARCHAR)||'-'||
+    CAST(EXTRACT(year_of_week from date_start) AS VARCHAR)||'-'||
         LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
     a.location_name as poi,
     a.poi_cbg,
