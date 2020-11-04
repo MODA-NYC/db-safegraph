@@ -38,7 +38,7 @@ OUTPUTS:
 
 query = """
     WITH daily_visits AS(
-    SELECT safegraph_place_id, poi_cbg, date_add('day', row_number() over(partition by safegraph_place_id), date_start) AS date_current, CAST(visits AS SMALLINT) as visits
+    SELECT safegraph_place_id, poi_cbg, date_add('day', (row_number() over(partition by safegraph_place_id, date_start)) - 1, date_start) AS date_current, CAST(visits AS SMALLINT) as visits
     FROM (
     SELECT
         safegraph_place_id,
