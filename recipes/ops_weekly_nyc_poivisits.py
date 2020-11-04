@@ -11,7 +11,7 @@ daily_visits AS(
         location_name, poi_cbg, visits_total, visitors_total, 
         max_visits_per_day, min_visits_per_day, 
         max_visits_per_hour, min_visits_per_hour,
-        date_add('day', row_number() over(partition by safegraph_place_id), date_start) AS date_current, 
+        date_add('day', (row_number() over(partition by safegraph_place_id, date_start)) - 1, date_start) AS date_current, 
         CAST(visits AS SMALLINT) as visits, median_dwell
     FROM (
     SELECT
