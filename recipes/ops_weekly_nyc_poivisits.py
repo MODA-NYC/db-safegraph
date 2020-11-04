@@ -8,7 +8,7 @@ WITH
 daily_visits AS(
     SELECT 
         safegraph_place_id, 
-        location_name, poi_cbg, visits_total, visitors_total, 
+        location_name, poi_cbg, visitors_total, 
         max_visits_per_day, min_visits_per_day, 
         max_visits_per_hour, min_visits_per_hour,
         date_add('day', (row_number() over(partition by safegraph_place_id, date_start)) - 1, date_start) AS date_current, 
@@ -21,7 +21,6 @@ daily_visits AS(
         CAST(SUBSTR(date_range_start, 1, 10) AS DATE) as date_start,
         CAST(SUBSTR(date_range_end, 1, 10) AS DATE) as date_end,
         raw_visitor_counts as visitors_total,
-        raw_visit_counts as visits_total,
         array_max(cast(json_parse(visits_by_day) as array<SMALLINT>)) as max_visits_per_day,
         array_min(cast(json_parse(visits_by_day) as array<SMALLINT>)) as min_visits_per_day,
         array_max(cast(json_parse(visits_by_each_hour) as array<SMALLINT>)) as max_visits_per_hour,
@@ -43,8 +42,7 @@ SELECT
     a.poi_cbg,
     SUM(CASE WHEN EXTRACT(dow from a.date_current) NOT IN (6, 7) THEN visits END) as visits_weekday,
     SUM(CASE WHEN EXTRACT(dow from a.date_current) IN (6, 7) THEN visits END) as visits_weekend,
-    SUM(a.visits) as visits_all_days,
-    a.visits_total,
+    SUM(a.visits) as visits_total,
     a.visitors_total,
     a.max_visits_per_day,
     a.min_visits_per_day,
@@ -55,7 +53,7 @@ FROM daily_visits a
 GROUP BY 
     a.safegraph_place_id, EXTRACT(year_of_week from a.date_current), 
     EXTRACT(week from a.date_current), a.location_name, a.poi_cbg, a.max_visits_per_day,
-    a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visits_total, a.visitors_total,
+    a.min_visits_per_day, a.max_visits_per_hour, a.min_visits_per_hour, a.visitors_total,
     a.median_dwell
 ORDER BY year_week, poi_cbg
 """
