@@ -41,8 +41,8 @@ SELECT
     CAST(EXTRACT(year_of_week from date_start) AS VARCHAR)||'-'||LPAD(CAST(EXTRACT(week from date_start) AS VARCHAR),2,'0') as year_week,
     SUBSTR(origin_census_block_group, 1, 5) as fips_county_origin,
     SUBSTR(desti_cbgs, 1, 5) as fips_county_destination,
-    SUM(CASE WHEN EXTRACT(dow from date_start) NOT IN (1, 7) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekday_trips,
-    SUM(CASE WHEN EXTRACT(dow from date_start) IN (1, 7) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekend_trips,
+    SUM(CASE WHEN EXTRACT(dow from date_start) NOT IN (6, 7) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekday_trips,
+    SUM(CASE WHEN EXTRACT(dow from date_start) IN (6, 7) THEN CAST(a[desti_cbgs] as SMALLINT) END) as weekend_trips,
     SUM(CAST(a[desti_cbgs] as SMALLINT)) as all_trips
 FROM dataset
 CROSS JOIN unnest(cbg) t(desti_cbgs)
