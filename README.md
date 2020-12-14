@@ -1,6 +1,8 @@
 # db-safegraph
 
-> Note: if you are a data user, checkout our sample notebooks under [`examples`](https://github.com/NYCPlanning/db-safegraph/tree/master/examples). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NYCPlanning/db-safegraph/blob/master/examples/examples.ipynb)
+## Note: 
++ if you are a programatic user, checkout our sample notebooks under [`examples`](https://github.com/NYCPlanning/db-safegraph/tree/master/examples). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NYCPlanning/db-safegraph/blob/master/examples/examples.ipynb)
++ If you are a desktop user and prefer to access data through a desktop GUI app, please check out [cyber duck](https://cyberduck.io/)
 
 ## Instructions
 1. Install dependencies
