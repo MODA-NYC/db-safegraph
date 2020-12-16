@@ -49,5 +49,5 @@ tablename2 = 'weekly_nyc_borough_summary'
 aws.execute_query(
     query=query2,
     database="safegraph", 
-    output=f"output/home_panel_summary/{tablename2}/{tablename2}.csv.zip"
+    output=f"output/production/home_panel_summary/{tablename2}/{tablename2}.csv.zip"
 )
