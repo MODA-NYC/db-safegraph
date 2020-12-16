@@ -66,7 +66,7 @@ for year_qrtr, range in quarters.items():
     aws.execute_query(
         query=query.format(start, end), 
         database="safegraph", 
-        output=f"output/social_distancing/weekly_county_trips/weekly_county_trips_{year_qrtr}.csv.zip"
+        output=f"output/production/social_distancing/weekly_county_trips/weekly_county_trips_{year_qrtr}.csv.zip"
     )
 
 # Add/update device count table for counties in 8-state region
@@ -83,5 +83,5 @@ query ="""
 aws.execute_query(
         query=query, 
         database="safegraph", 
-        output="output/social_distancing/device_counts_by_county.csv.zip"
+        output="output/production/social_distancing/device_counts_by_county.csv.zip"
     )
