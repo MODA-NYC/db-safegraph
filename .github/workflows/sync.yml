@@ -1,8 +1,7 @@
 name: S3 bucket sync
 
 on:
-  repository_dispatch:
-    types: [sync]
+  workflow_dispatch:
   schedule:
     - cron: 0 0 * * *
 
