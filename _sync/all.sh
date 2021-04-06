@@ -1,5 +1,5 @@
 #!/bin/bash
-SG_BASEPATH_CORE=sg/sg-c19-response
+SG_BASEPATH=sg/sg-c19-response
 RDP_BASEPATH=rdp/recovery-data-partnership/output/raw
 
 function max_bg_procs {
@@ -18,7 +18,7 @@ function max_bg_procs {
     done
 }
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH_CORE)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH)
 do 
     max_bg_procs 10
     (
