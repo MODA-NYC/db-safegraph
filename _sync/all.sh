@@ -23,8 +23,7 @@ do
     max_bg_procs 10
     (
         KEY=$(echo $INFO | jq -r '.key')
-        FILENAME=$(basename $KEY)
-        STATUS=$(mc stat --json $RDP_BASEPATH/$FILENAME | jq -r '.status')
+        STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
         case $STATUS in
         success)
             # If already synced, skip
@@ -32,7 +31,7 @@ do
         ;;
         error)
             # if not, create a sync ...
-            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$FILENAME
+            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
         ;;
         esac
     ) &
