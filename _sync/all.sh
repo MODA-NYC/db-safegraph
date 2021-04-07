@@ -1,5 +1,5 @@
 #!/bin/bash
-SG_BASEPATH_CORE=sg/sg-c19-response
+SG_BASEPATH=sg/sg-c19-response
 RDP_BASEPATH=rdp/recovery-data-partnership/output/raw
 
 function max_bg_procs {
@@ -18,13 +18,12 @@ function max_bg_procs {
     done
 }
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH_CORE)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH)
 do 
     max_bg_procs 10
     (
         KEY=$(echo $INFO | jq -r '.key')
-        FILENAME=$(basename $KEY)
-        STATUS=$(mc stat --json $RDP_BASEPATH/$FILENAME | jq -r '.status')
+        STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
         case $STATUS in
         success)
             # If already synced, skip
@@ -32,7 +31,7 @@ do
         ;;
         error)
             # if not, create a sync ...
-            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$FILENAME
+            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
         ;;
         esac
     ) &
