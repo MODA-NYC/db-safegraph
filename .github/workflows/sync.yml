@@ -41,7 +41,7 @@ jobs:
 
       - name: Sync Weekly Patterns and Home Panel Summary ...
         run: |
-          ./sg sync --name weekly_patterns
+         # ./sg sync --name weekly_patterns
           ./sg sync --name home_panel_summary
       
       - name: Sync GeoSupplement ...
