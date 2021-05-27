@@ -1,7 +1,7 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/weekly-patterns/v2/main-file
-SG_BASEPATH_NEW=sg/sg-c19-response/weekly-patterns-delivery/weekly/patterns
-RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns
+SG_BASEPATH=sg/sg-c19-response/weekly-patterns-delivery-2020-12-backfill/patterns_backfill
+SG_BASEPATH_NEW=sg/sg-c19-response/weekly-patterns-delivery-2020-12/weekly/patterns
+RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns_test
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
             echo "Usage: max_bg_procs NUM_PROCS.  Will wait until the number of background (&)"
