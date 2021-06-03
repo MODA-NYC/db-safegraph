@@ -1,7 +1,7 @@
 #!/bin/bash
 SG_BASEPATH=sg/sg-c19-response/weekly-patterns-delivery-2020-12-backfill/patterns_backfill
 SG_BASEPATH_NEW=sg/sg-c19-response/weekly-patterns-delivery-2020-12/weekly/patterns
-RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns_test
+RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns_new
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
             echo "Usage: max_bg_procs NUM_PROCS.  Will wait until the number of background (&)"
@@ -25,22 +25,30 @@ do
         KEY=$(echo $INFO | jq -r '.key')
         NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
         FILENAME=$(basename $KEY)
-        DATE=$(echo $FILENAME | cut -c1-10)
-        PARTITION="dt=$DATE"
+        # DATE=$(echo $FILENAME | cut -c1-10)
+        # PARTITION="dt=$DATE"
         SUBPATH=$(echo $KEY | cut -c-13)
-
+        echo "INFO:" $INFO
+        echo "KEY:" $KEY
+        echo "NEW_KEY:" $NEW_KEY
+        echo "FILENAME:" $FILENAME
+        echo "SUBPATH:" $SUBPATH
+        
         if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
             # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
+                # echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $NEW_KEY, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
+                # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
             ;;
             esac
         else echo "ignore $FILENAME"
@@ -50,45 +58,45 @@ done
 wait
 echo "Syncing Backfill Complete!"
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH_NEW)
-do 
-    max_bg_procs 5
-    (
-        KEY=$(echo $INFO | jq -r '.key')
-        NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
-        DATE=$(echo $NEW_KEY | cut -c1-10)
-        PARTITION="dt=$DATE"
-        FILENAME=$(basename $KEY)
-        SUBPATH=$(echo $KEY | cut -c-13)
-        if  [ "${FILENAME#*.}" = "csv.gz" ]; then
+# for INFO in $(mc ls --recursive --json $SG_BASEPATH_NEW)
+# do 
+#     max_bg_procs 5
+#     (
+#         KEY=$(echo $INFO | jq -r '.key')
+#         NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
+#         DATE=$(echo $NEW_KEY | cut -c1-10)
+#         PARTITION="dt=$DATE"
+#         FILENAME=$(basename $KEY)
+#         SUBPATH=$(echo $KEY | cut -c-13)
+#         if  [ "${FILENAME#*.}" = "csv.gz" ]; then
 
-            # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+#             # Check existence
+#             STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
             
-            case $STATUS in
-            success)
-                echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
-            ;;
-            error)
-                mkdir -p tmp
-                mc cp $SG_BASEPATH_NEW/$KEY tmp/$FILENAME
-                (
-                    # Remove placekey, effective after 2020 october
-                    cd tmp
-                    gunzip $FILENAME
-                    CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
-                    cut -f1 -d, --complement $CSVNAME > _$CSVNAME
-                    rm $CSVNAME
-                    gzip _$CSVNAME
-                )
-                mc cp tmp/_$FILENAME $RDP_BASEPATH/$PARTITION/$NEW_KEY
-                rm tmp/_$FILENAME
-            ;;
-            esac
-        else echo "ignore $FILENAME"
-        fi
-    ) &
-done
+#             case $STATUS in
+#             success)
+#                 echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
+#             ;;
+#             error)
+#                 mkdir -p tmp
+#                 mc cp $SG_BASEPATH_NEW/$KEY tmp/$FILENAME
+#                 (
+#                     # Remove placekey, effective after 2020 october
+#                     cd tmp
+#                     gunzip $FILENAME
+#                     CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+#                     cut -f1 -d, --complement $CSVNAME > _$CSVNAME
+#                     rm $CSVNAME
+#                     gzip _$CSVNAME
+#                 )
+#                 mc cp tmp/_$FILENAME $RDP_BASEPATH/$PARTITION/$NEW_KEY
+#                 rm tmp/_$FILENAME
+#             ;;
+#             esac
+#         else echo "ignore $FILENAME"
+#         fi
+#     ) &
+# done
 
-wait
-echo "Syncing New Complete !"
+# wait
+# echo "Syncing New Complete !"
