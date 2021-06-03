@@ -1,6 +1,6 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/weekly-patterns-delivery-2020-12-backfill/patterns_backfill
-SG_BASEPATH_NEW=sg/sg-c19-response/weekly-patterns-delivery-2020-12/weekly/patterns
+SG_BASEPATH_BACKFILL=sg/sg-c19-response/weekly-patterns-delivery-2020-12-backfill/patterns_backfill
+SG_BASEPATH=sg/sg-c19-response/weekly-patterns-delivery-2020-12/weekly/patterns
 RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns_new
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -18,21 +18,17 @@ function max_bg_procs {
     done
 }
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH_BACKFILL)
 do 
     max_bg_procs 5
     (
         KEY=$(echo $INFO | jq -r '.key')
-        NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
+        NEW_KEY=$(python3 -c "print('$KEY'[14:].replace('/', '-'))")
         FILENAME=$(basename $KEY)
         # DATE=$(echo $FILENAME | cut -c1-10)
         # PARTITION="dt=$DATE"
-        SUBPATH=$(echo $KEY | cut -c-13)
-        echo "INFO:" $INFO
-        echo "KEY:" $KEY
+        # SUBPATH=$(echo $KEY | cut -c-13)
         echo "NEW_KEY:" $NEW_KEY
-        echo "FILENAME:" $FILENAME
-        echo "SUBPATH:" $SUBPATH
         
         if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
@@ -48,7 +44,7 @@ do
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
                 # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$NEW_KEY
             ;;
             esac
         else echo "ignore $FILENAME"
@@ -57,6 +53,36 @@ do
 done
 wait
 echo "Syncing Backfill Complete!"
+
+for INFO in $(mc ls --recursive --json $SG_BASEPATH)
+do 
+    max_bg_procs 5
+    (
+        KEY=$(echo $INFO | jq -r '.key')
+        NEW_KEY=$(python3 -c "print('$KEY'[:11].replace('/', '-')+'$KEY'[14:])")
+        FILENAME=$(basename $KEY)
+        echo "NEW_KEY:" $NEW_KEY
+        
+        if [ "${FILENAME#*.}" = "csv.gz" ]; then
+
+            # Check existence
+            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
+            
+            case $STATUS in
+            success)
+                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+            ;;
+            error)
+                # Download data and unzip, remove README.txt and the original .zip file
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+            ;;
+            esac
+        else echo "ignore $FILENAME"
+        fi
+    ) &
+done
+wait
+echo "Syncing Complete!"
 
 # for INFO in $(mc ls --recursive --json $SG_BASEPATH_NEW)
 # do 
