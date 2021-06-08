@@ -31,7 +31,7 @@ WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/weekly_patterns/'
+) LOCATION 's3://recovery-data-partnership/weekly_patterns_new/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   "skip.header.line.count"="1"
