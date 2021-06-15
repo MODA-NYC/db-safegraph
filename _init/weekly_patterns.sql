@@ -1,5 +1,8 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns (
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns_new (
+  `placekey` string,
   `safegraph_place_id` string,
+  `parent_placekey` string,
+  `parent_safegraph_place_id` string,
   `location_name` string,
   `street_address` string,
   `city` string,
@@ -23,9 +26,8 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns (
   `bucketed_dwell_times`string,
   `related_same_day_brand` string,
   `related_same_week_brand` string,
-  `device_type` string 
+  `device_type` string
 )
-PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',
