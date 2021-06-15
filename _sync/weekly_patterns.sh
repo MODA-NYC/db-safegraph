@@ -24,7 +24,7 @@ do
     (
         KEY=$(echo $INFO | jq -r '.key')
         NEW_KEY=$(python3 -c "print('$KEY'[14:].replace('/', '-'))")
-        YEAR=$(python3 -c "print('$NEW_KEY'[:4])"
+        YEAR=$(python3 -c "print('$NEW_KEY'[:4])")
         FILENAME=$(basename $KEY)
         # DATE=$(echo $FILENAME | cut -c1-10)
         # PARTITION="dt=$DATE"
