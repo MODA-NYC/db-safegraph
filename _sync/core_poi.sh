@@ -33,10 +33,6 @@ do
         PREFIX=${GGPARENT////}
         # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
-        echo "KEY: " $KEY
-        echo "PARENT: " $PARENT
-        echo "GPARENT: " $GPARENT
-        echo "GGPARENT: " $GGPARENT
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         if [ $PARENT != '2020/11/06/11' ]; then
@@ -99,8 +95,8 @@ do
                     # Transfer data
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv
-                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv"
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv
+                    echo "Copy $SG_BASEPATH_BRAND/$KEY to $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv"
+                    mc cp $SG_BASEPATH_BRAND/$KEY $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv
                 ;;
                 esac
             else echo "ignore $FILENAME"
