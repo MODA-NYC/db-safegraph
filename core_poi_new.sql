@@ -1,7 +1,8 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi 
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_new 
 (
   `placekey` string,
   `safegraph_place_id` string,
+  `parent_placekey` string,
   `parent_safegraph_place_id` string,
   `location_name` string,
   `safegraph_brand_ids` string,
@@ -18,9 +19,12 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi
   `iso_country_code` string,
   `phone_number` string,
   `open_hours` string,
-  `category_tags` string 
+  `category_tags` string,
+  `opened_on` string,
+  `closed_on` string,
+  `tracking_opened_since` string,
+  `tracking_closed_since` string
 )
-PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',
