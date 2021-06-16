@@ -35,7 +35,8 @@ do
         # PARTITION="dt=$DATE"
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
-        if [ $PARENT != '2020/11/06/11' ]; then
+        # 2020/11 core poi data doesn't have parent_placekey
+        if [ $GGPARENT != '2020/11' ]; then
             if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
                 # Check existence
