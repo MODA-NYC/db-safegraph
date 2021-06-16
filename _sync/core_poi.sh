@@ -1,7 +1,7 @@
 #!/bin/bash
 SG_BASEPATH_CORE=sg/sg-c19-response/core-places-delivery/core_poi
 SG_BASEPATH_BRAND=sg/sg-c19-response/core-places-delivery/brand_info
-RDP_BASEPATH=rdp/recovery-data-partnership/core_poi
+RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_new
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -31,25 +31,33 @@ do
         LOCAL_KEY=tmp/$KEY
         LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
-        DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
-        PARTITION="dt=$DATE"
+        # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
+        # PARTITION="dt=$DATE"
+        echo "KEY: " $KEY
+        echo "PARENT: " $PARENT
+        echo "GPARENT: " $GPARENT
+        echo "GGPARENT: " $GGPARENT
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         if [ $PARENT != '2020/11/06/11' ]; then
             if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
                 # Check existence
-                STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME | jq -r '.status')
+                # STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME | jq -r '.status')
+                STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PREFIX-$FILENAME | jq -r '.status')
                 
                 case $STATUS in
                 success)
-                    echo "$KEY is already synced to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME, skipping ..."
+                    # echo "$KEY is already synced to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME, skipping ..."
+                    echo "$KEY is already synced to $RDP_BASEPATH/poi/$PREFIX-$FILENAME, skipping ..."
                 ;;
                 error)
                     # Transfer data
-                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
-                ;;
+                    # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
+                    # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
+                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
+                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                 ;;
                 esac
             else echo "ignore $FILENAME"
             fi
@@ -71,24 +79,28 @@ do
         LOCAL_KEY=tmp/$KEY
         LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
-        DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
-        PARTITION="dt=$DATE"
+        # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
+        # PARTITION="dt=$DATE"
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         if [ $PARENT != '2020/11/06/11' ]; then
             if [ "${FILENAME#*.}" = "csv" ]; then
 
                 # Check existence
-                STATUS=$(mc stat --json $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv | jq -r '.status')
+                # STATUS=$(mc stat --json $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv | jq -r '.status')
+                STATUS=$(mc stat --json $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv | jq -r '.status')
                 
                 case $STATUS in
                 success)
-                    echo "$KEY is already synced to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv, skipping ..."
+                    # echo "$KEY is already synced to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv, skipping ..."
+                    echo "$KEY is already synced to $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv, skipping ..."
                 ;;
                 error)
                     # Transfer data
-                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv"
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv
+                    # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv"
+                    # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv
+                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv"
+                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv
                 ;;
                 esac
             else echo "ignore $FILENAME"
