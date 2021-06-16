@@ -24,20 +24,16 @@ do
     (
         KEY=$(echo $INFO | jq -r '.key')
         NEW_KEY=$(python3 -c "print('$KEY'[14:].replace('/', '-'))")
-        YEAR=$(python3 -c "print('$NEW_KEY'[:4])")
-        YEARMONTH_CHAR=$(python3 -c "print('$NEW_KEY'[:7].replace('-',''))")
-        YEARMONTH_INT="$((YEARMONTH_CHAR * 1))"
+        YEARMONTH=$(python3 -c "print('$NEW_KEY'[:7])")
         FILENAME=$(basename $KEY)
         # DATE=$(echo $FILENAME | cut -c1-10)
         # PARTITION="dt=$DATE"
         # SUBPATH=$(echo $KEY | cut -c-13)
         echo "NEW_KEY:" $NEW_KEY
-        echo "YEAR MONTH:" $YEARMONTH_INT
+        echo "YEAR MONTH:" $YEARMONTH
         
-        if [ "${FILENAME#*.}" = "csv.gz" ] && [ $YEARMONTH_INT > 201801 ]; then
+        if [ "${FILENAME#*.}" = "csv.gz" ] && [ $YEARMONTH != '2018-01' ]; then
             
-            echo "processing"
-
             # Check existence
             # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
