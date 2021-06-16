@@ -26,7 +26,7 @@ WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/core_poi/poi/'
+) LOCATION 's3://recovery-data-partnership/core_poi_new/poi/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   'compressionType'='gzip',
