@@ -28,8 +28,8 @@ do
         PARENT=$(dirname $KEY)
         GPARENT=$(dirname $PARENT)
         GGPARENT=$(dirname $GPARENT)
-        LOCAL_KEY=tmp/$KEY
-        LOCAL_PARENT=$(dirname $LOCAL_KEY)
+        # LOCAL_KEY=tmp/$KEY
+        # LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
         # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
@@ -73,8 +73,8 @@ do
         PARENT=$(dirname $KEY)
         GPARENT=$(dirname $PARENT)
         GGPARENT=$(dirname $GPARENT)
-        LOCAL_KEY=tmp/$KEY
-        LOCAL_PARENT=$(dirname $LOCAL_KEY)
+        # LOCAL_KEY=tmp/$KEY
+        # LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
         # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"

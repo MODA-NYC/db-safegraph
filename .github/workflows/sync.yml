@@ -33,8 +33,8 @@ jobs:
       # - name: Sync All Raw Data
       #   run: ./sg sync --name all
         
-      - name: Sync Core POI ...
-        run: ./sg sync --name core_poi
+      # - name: Sync Core POI ...
+      #   run: ./sg sync --name core_poi
       
       # - name: Sync Social Distancing ...
       #   run: ./sg sync --name social_distancing
@@ -44,6 +44,9 @@ jobs:
       #    ./sg sync --name weekly_patterns
       #     # ./sg sync --name home_panel_summary
       
+      - name: Sync Monthly Patterns ...
+        run: ./sg sync --name monthly_patterns
+
       # - name: Sync GeoSupplement ...
       #   run: ./sg sync --name geo_supplement
 
