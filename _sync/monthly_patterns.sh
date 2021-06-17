@@ -30,7 +30,7 @@ do
         # PARTITION="dt=$DATE"
         # SUBPATH=$(echo $KEY | cut -c-13)
         PARENT=$(dirname $KEY)
-        YEARMONTH=$(python3 -c "print('$PARENT'[-7:].replace('/','-'))")
+        YEARMONTH=$(python3 -c "print('$PARENT'[-7:].replace('/',''))")
         echo "KEY: " $KEY
         echo "PARENT: " $PARENT
         echo "YEARMONTH: " $YEARMONTH
