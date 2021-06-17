@@ -36,7 +36,7 @@ do
         echo "YEARMONTH: " $YEARMONTH
         
         # 3 months are duplicated between backfill and new data
-        if [ $YEARMONTH != '202011' ] || [ $YEARMONTH != '202012' ] || [ $YEARMONTH != '202101' ]; then
+        if [ $YEARMONTH != '202011' ] && [ $YEARMONTH != '202012' ] && [ $YEARMONTH != '202101' ]; then
             if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
                 # Check existence
