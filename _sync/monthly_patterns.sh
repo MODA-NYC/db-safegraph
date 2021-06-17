@@ -35,23 +35,25 @@ do
         echo "PARENT: " $PARENT
         echo "YEARMONTH: " $YEARMONTH
         
-        if ! [ "$FILENAME" = "_SUCCESS" ]; then
+        # 3 months are duplicated between backfill and new data
+        if [ $YEARMONTH != '202011' ] || [ $YEARMONTH != '202012' ] || [ $YEARMONTH != '202101' ]; then
+            if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
-            # Check existence
-            # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
-            STATUS=$(mc stat --json $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME | jq -r '.status')
-            
-            case $STATUS in
-            success)
-                echo "$KEY is already synced to $YEARMONTH-BF-$FILENAME, skipping ..."
-            ;;
-            error)
-                # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME
-            ;;
-            esac
-        else echo "ignore _SUCCESS"
-        fi
+                # Check existence
+                # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+                STATUS=$(mc stat --json $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME | jq -r '.status')
+                
+                case $STATUS in
+                success)
+                    echo "$KEY is already synced to $YEARMONTH-BF-$FILENAME, skipping ..."
+                ;;
+                error)
+                    # Download data and unzip, remove README.txt and the original .zip file
+                    mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME
+                ;;
+                esac
+            else echo "ignore _SUCCESS"
+            fi
     ) &
 done
 wait
