@@ -54,6 +54,7 @@ do
                 esac
             else echo "ignore _SUCCESS"
             fi
+        fi
     ) &
 done
 wait
