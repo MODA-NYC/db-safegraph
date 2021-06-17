@@ -30,28 +30,24 @@ do
         # PARTITION="dt=$DATE"
         # SUBPATH=$(echo $KEY | cut -c-13)
         PARENT=$(dirname $KEY)
-        GPARENT=$(dirname $PARENT)
-        GGPARENT=$(dirname $GPARENT)
-        PREFIX=${GGPARENT////}
+        YEARMONTH=$(python3 -c "print('$PARENT'[-7:].replace('/','-')")
         echo "KEY: " $KEY
         echo "PARENT: " $PARENT
-        echo "GPARENT: " $GPARENT
-        echo "GGPARENT: " $GGPARENT
-        echo "PREFIX: " $PREFIX
-
+        echo "YEARMONTH: " $YEARMONTH
+        
         if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
             # Check existence
             # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
-            STATUS=$(mc stat --json $RDP_BASEPATH/$PREFIX-BF-$FILENAME | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $PREFIX-BF-$FILENAME, skipping ..."
+                echo "$KEY is already synced to $YEARMONTH-BF-$FILENAME, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$PREFIX-BF-$FILENAME
+                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME
             ;;
             esac
         else echo "ignore _SUCCESS"
