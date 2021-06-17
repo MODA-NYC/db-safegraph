@@ -1,5 +1,8 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.monthly_patterns (
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.monthly_patterns_new (
+  `placekey` string,
   `safegraph_place_id` string,
+  `parent_placekey` string,
+  `parent_safegraph_place_id` string,
   `location_name` string,
   `street_address` string,
   `city` string,
@@ -15,7 +18,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.monthly_patterns (
   `poi_cbg` string,
   `visitor_home_cbgs` string,
   `visitor_daytime_cbgs` string,
-  `visitor_work_cbgs` string,
   `visitor_country_of_origin` string,
   `distance_from_home` string,
   `median_dwell` string,
@@ -31,7 +33,7 @@ WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/monthly_patterns/'
+) LOCATION 's3://recovery-data-partnership/monthly_patterns_new/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   "skip.header.line.count"="1"
