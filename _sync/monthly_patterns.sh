@@ -1,7 +1,8 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/monthly-patterns/patterns_backfill
-SG_BASEPATH_NEW=sg/sg-c19-response/monthly-patterns/patterns
-RDP_BASEPATH=rdp/recovery-data-partnership/monthly_patterns
+SG_BASEPATH_BACKFILL=sg/sg-c19-response/monthly-patterns-2020-12/patterns_backfill
+SG_BASEPATH=sg/sg-c19-response/monthly-patterns-2020-12/patterns
+RDP_BASEPATH=rdp/recovery-data-partnership/monthly_patterns_new
+
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
             echo "Usage: max_bg_procs NUM_PROCS.  Will wait until the number of background (&)"
@@ -18,28 +19,39 @@ function max_bg_procs {
     done
 }
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH_BACKFILL)
 do 
     max_bg_procs 5
     (
         KEY=$(echo $INFO | jq -r '.key')
-        NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
+        # NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
         FILENAME=$(basename $KEY)
-        DATE=$(echo $FILENAME | cut -c1-10)
-        PARTITION="dt=$DATE"
-        SUBPATH=$(echo $KEY | cut -c-13)
+        # DATE=$(echo $FILENAME | cut -c1-10)
+        # PARTITION="dt=$DATE"
+        # SUBPATH=$(echo $KEY | cut -c-13)
+        PARENT=$(dirname $KEY)
+        GPARENT=$(dirname $PARENT)
+        GGPARENT=$(dirname $GPARENT)
+        PREFIX=${GGPARENT////}
+        echo "KEY: " $KEY
+        echo "PARENT: " $PARENT
+        echo "GPARENT: " $GPARENT
+        echo "GGPARENT: " $GGPARENT
+        echo "PREFIX: " $PREFIX
+
         if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
             # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$PREFIX-BF-$FILENAME | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $PREFIX-BF-$FILENAME, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$PREFIX-BF-$FILENAME
             ;;
             esac
         else echo "ignore _SUCCESS"
@@ -49,26 +61,36 @@ done
 wait
 echo "Syncing Backfill Complete !"
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH_NEW)
+for INFO in $(mc ls --recursive --json $SG_BASEPATH)
 do 
     max_bg_procs 5
     (
         KEY=$(echo $INFO | jq -r '.key')
-        NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
+        # NEW_KEY=$(python3 -c "print('$KEY'.replace('/', '-'))")
         FILENAME=$(basename $KEY)
-        SUBPATH=$(echo $KEY | cut -c-13)
+        # SUBPATH=$(echo $KEY | cut -c-13)
+        PARENT=$(dirname $KEY)
+        GPARENT=$(dirname $PARENT)
+        GGPARENT=$(dirname $GPARENT)
+        PREFIX=${GGPARENT////}
+        echo "KEY: " $KEY
+        echo "PARENT: " $PARENT
+        echo "GPARENT: " $GPARENT
+        echo "GGPARENT: " $GGPARENT
+        echo "PREFIX: " $PREFIX
+
         if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
             # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$PREFIX-$FILENAME | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $PREFIX-$FILENAME, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
-                mc cp $SG_BASEPATH_NEW/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PREFIX-$FILENAME
             ;;
             esac
         else echo "ignore _SUCCESS"
