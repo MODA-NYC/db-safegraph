@@ -39,13 +39,13 @@ jobs:
       # - name: Sync Social Distancing ...
       #   run: ./sg sync --name social_distancing
 
-      # - name: Sync Weekly Patterns and Home Panel Summary ...
-      #   run: |
-      #    ./sg sync --name weekly_patterns
-      #     # ./sg sync --name home_panel_summary
+      - name: Sync Weekly Patterns and Home Panel Summary ...
+        run: |
+          ./sg sync --name home_panel_summary
+        #  ./sg sync --name weekly_patterns
       
-      - name: Sync Monthly Patterns ...
-        run: ./sg sync --name monthly_patterns
+      # - name: Sync Monthly Patterns ...
+      #   run: ./sg sync --name monthly_patterns
 
       # - name: Sync GeoSupplement ...
       #   run: ./sg sync --name geo_supplement
