@@ -36,20 +36,20 @@ do
 
             # Check existence
             # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$FILENAME | jq -r '.status')
-            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY-$FILENAME | jq -r '.status')
             
             case $STATUS in
             success)
                 # echo "$KEY is already synced to $PARTITION/$FILENAME, skipping ..."
-                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $NEW_KEY-$FILENAME, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
                 # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$FILENAME
-                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$NEW_KEY-$FILENAME
             ;;
             esac
-        else echo "ignore $NEW_KEY"
+        else echo "ignore $NEW_KEY-$FILENAME"
         fi
     ) &
 done
@@ -63,7 +63,7 @@ do
         KEY=$(echo $INFO | jq -r '.key')
         FILENAME=$(basename $KEY)
         PARENT=$(dirname $KEY)
-        NEW_KEY=$(python3 -c "print('$KEY'[-13:-3].replace('/', '-'))")
+        NEW_KEY=$(python3 -c "print('$PARENT'[-13:-3].replace('/', '-'))")
         # DATE=$(echo $NEW_KEY | cut -c1-10)
         # PARTITION="dt=$DATE"
         # SUBPATH=$(echo $KEY | cut -c-13)
@@ -74,20 +74,20 @@ do
 
             # Check existence
             # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
-            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY-$FILENAME | jq -r '.status')
             
             case $STATUS in
             success)
                 # echo "$KEY is already synced to $PARTITION/$NEW_KEY, skipping ..."
-                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $NEW_KEY-$FILENAME, skipping ..."
             ;;
             error)
                 # Download data and unzip, remove README.txt and the original .zip file
                 # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PARTITION/$NEW_KEY
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY-$FILENAME
             ;;
             esac
-        else echo "ignore $NEW_KEY"
+        else echo "ignore $NEW_KEY-$FILENAME"
         fi
     ) &
 done
