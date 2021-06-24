@@ -49,11 +49,22 @@ do
                     echo "$KEY is already synced to $RDP_BASEPATH/poi/$PREFIX-$FILENAME, skipping ..."
                 ;;
                 error)
+                    mkdir -p tmp
+                    mc cp $SG_BASEPATH_CORE/$KEY tmp/$FILENAME
+                    (
+                        cd tmp
+                        gunzip $FILENAME
+                        CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+                        awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$20=d; print}' $CSVNAME > _$CSVNAME
+                        rm $CSVNAME
+                        gzip _$CSVNAME
+                    )
                     # Transfer data
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
                     echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    mc cp tmp/_$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    rm tmp/_$FILENAME
                  ;;
                 esac
             else echo "ignore $FILENAME"
