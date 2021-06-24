@@ -18,7 +18,8 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi
   `iso_country_code` string,
   `phone_number` string,
   `open_hours` string,
-  `category_tags` string 
+  `category_tags` string,
+  `month_year` string
 )
 PARTITIONED BY (dt DATE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
