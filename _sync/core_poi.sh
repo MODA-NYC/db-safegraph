@@ -58,7 +58,7 @@ do
                     #     awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$21=d; print}' $CSVNAME > _$CSVNAME
                     #     rm $CSVNAME
                     #     gzip _$CSVNAME
-                    )
+                    # )
                     # Transfer data
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
