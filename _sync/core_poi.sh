@@ -1,7 +1,7 @@
 #!/bin/bash
 SG_BASEPATH_CORE=sg/sg-c19-response/core-places-delivery/core_poi
 SG_BASEPATH_BRAND=sg/sg-c19-response/core-places-delivery/brand_info
-RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_new
+RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_new2
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -49,23 +49,23 @@ do
                     echo "$KEY is already synced to $RDP_BASEPATH/poi/$PREFIX-$FILENAME, skipping ..."
                 ;;
                 error)
-                    # mkdir -p tmp
-                    # mc cp $SG_BASEPATH_CORE/$KEY tmp/$FILENAME
-                    # (
-                    #     cd tmp
-                    #     gunzip $FILENAME
-                    #     CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
-                    #     awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$21=d; print}' $CSVNAME > _$CSVNAME
-                    #     rm $CSVNAME
-                    #     gzip _$CSVNAME
-                    # )
+                    mkdir -p tmp
+                    mc cp $SG_BASEPATH_CORE/$KEY tmp/$FILENAME
+                    (
+                        cd tmp
+                        gunzip $FILENAME
+                        CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+                        awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
+                        rm $CSVNAME
+                        gzip _$CSVNAME
+                    )
                     # Transfer data
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
                     echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
-                    # mc cp tmp/_$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                #    rm tmp/_$FILENAME
+                    mc cp tmp/_$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    rm tmp/_$FILENAME
                  ;;
                 esac
             else echo "ignore $FILENAME"
