@@ -55,7 +55,7 @@ do
                         cd tmp
                         gunzip $FILENAME
                         CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
-                        awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$20=d; print}' $CSVNAME > _$CSVNAME
+                        awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$21=d; print}' $CSVNAME > _$CSVNAME
                         rm $CSVNAME
                         gzip _$CSVNAME
                     )
