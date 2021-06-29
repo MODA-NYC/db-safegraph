@@ -50,20 +50,21 @@ do
                 ;;
                 error)
                     mkdir -p tmp
-                    mc cp $SG_BASEPATH_CORE/$KEY tmp/$FILENAME
+                    mc cp $SG_BASEPATH_CORE/$KEY tmp/$PREFIX-$FILENAME
                     (
                         cd tmp
-                        gunzip $FILENAME
-                        CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+                        gunzip $PREFIX-$FILENAME
                         python3 ../core_add_date.py
+                        gzip $PREFIX-$FILENAME
+                        # CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
                         # awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
                         # rm $CSVNAME
-                        gzip $CSVNAME
+                        # gzip _$CSVNAME
                     )
                     # Transfer data
-                    mc cp tmp/$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                    rm tmp/$FILENAME
-                    # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
+                    mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    rm tmp/$PREFIX-$FILENAME
+                    # # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
