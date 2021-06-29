@@ -55,8 +55,9 @@ do
                         cd tmp
                         gunzip $PREFIX-$FILENAME
                         python3 ../core_add_date.py
-                        gzip $PREFIX-$FILENAME
-                        # CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
+                        CSVNAME=$(python3 -c "print('$PREFIX-$FILENAME'.replace('.gz', ''))")
+                        ls -la
+                        gzip $CSVNAME
                         # awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
                         # rm $CSVNAME
                         # gzip _$CSVNAME
