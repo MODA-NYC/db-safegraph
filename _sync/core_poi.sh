@@ -33,6 +33,7 @@ do
         PREFIX=${GGPARENT////}
         # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
+        pwd
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         # 2020/11 core poi data doesn't have parent_placekey
