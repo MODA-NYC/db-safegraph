@@ -58,7 +58,7 @@ do
                         CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
                         echo "FILENAME: " $FILENAME
                         echo "CSVNAME: " $CSVNAME
-                        python3 core_add_date.py
+                        python3 ../core_add_date.py
                         # awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
                         # rm $CSVNAME
                         gzip $CSVNAME
