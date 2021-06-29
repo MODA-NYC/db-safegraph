@@ -20,7 +20,10 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_new
   `phone_number` string,
   `open_hours` string,
   `category_tags` string,
-  `month_year` string
+  `opened_on` string,
+  `closed_on` string,
+  `tracking_opened_since` string,
+  `tracking_closed_since` string
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
