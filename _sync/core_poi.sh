@@ -33,7 +33,6 @@ do
         PREFIX=${GGPARENT////}
         # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
-        pwd
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         # 2020/11 core poi data doesn't have parent_placekey
@@ -56,8 +55,6 @@ do
                         cd tmp
                         gunzip $FILENAME
                         CSVNAME=$(python3 -c "print('$FILENAME'.replace('.gz', ''))")
-                        echo "FILENAME: " $FILENAME
-                        echo "CSVNAME: " $CSVNAME
                         python3 ../core_add_date.py
                         # awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
                         # rm $CSVNAME
