@@ -2,6 +2,7 @@ import pandas as pd
 import os
 
 files = [f for f in os.listdir('.') if f[-3:]=='csv']
+print("files: ", files)
 
 for f in files:
     year_month = f[:6]
