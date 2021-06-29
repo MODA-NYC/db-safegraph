@@ -1,14 +1,15 @@
 import pandas as pd
 import os
 
-file_name = [f for f in os.listdir('.') if f[-3:]=='csv'][0]
-year_month = file_name[:6]
-print("filename: ", file_name)
-print("year-month: ", year_month)
+files = [f for f in os.listdir('.') if f[-3:]=='csv']
 
-df = pd.read_csv(file_name)
-df['year_month'] = year_month
-print(df.shape)
-print(df.columns)
+for f in files:
+    year_month = f[:6]
+    print("filename: ", f)
+    print("year-month: ", year_month)
 
-df.to_csv(file_name)
+    df = pd.read_csv(f)
+    df['year_month'] = year_month
+    print(df.shape)
+
+    df.to_csv(f)
