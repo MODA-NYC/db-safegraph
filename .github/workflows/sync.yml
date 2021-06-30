@@ -3,7 +3,9 @@ name: S3 bucket sync
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 0 * * *
+    - cron: 30 0 * * *
+
+concurrency: staging_environment
 
 jobs: 
   Sync:
