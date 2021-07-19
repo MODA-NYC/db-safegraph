@@ -35,6 +35,16 @@ Commands:
   sync   Syncing a safegraph data source, under the ./_sync folder
 ```
 
+## Actions and Workflows
+This repository utilizes GitHub Actions to run workflows for data retrieval, processing, and publishing. Each workflow has a specific task and run frequency.
+
+<details><summary>Workflows</summary>
+  <p>+ Create Docker Image: Disabled</p>
+  <p>+ S3 Bucket Sync: Daily</p>
+  <p>+ Update Daily Tables: Disabled</p>
+  <p>+ Update Weekly Tables Disabled</p>
+</details>
+
 ## Resources
 - [Data Science Resources](https://docs.safegraph.com/docs/data-science-resources)
 - [Colab - Quantifying Sampling Bias in SafeGraph Patterns](https://colab.research.google.com/drive/1u15afRytJMsizySFqA2EPlXSh3KTmNTQ#sandboxMode=true&scrollTo=WUWFYLLXowUJ)
