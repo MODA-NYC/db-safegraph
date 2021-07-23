@@ -63,8 +63,8 @@ do
                         # gzip _$CSVNAME
                     )
                     # Transfer data
-                    # mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                    rm tmp/$PREFIX-$FILENAME                    # Transfer data
+                    mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    rm tmp/$PREFIX-$FILENAME                    
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
