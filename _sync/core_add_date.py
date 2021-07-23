@@ -8,8 +8,8 @@ print("files: ", files)
 for f in files:
     print("filename: ", f)
     year_month = f[:6]
-    df = pd.read_csv(file, compression='gzip')
+    df = pd.read_csv(f, compression='gzip')
     df['year_month'] = year_month
     print(df.shape)
     print(list(df))
-    df.to_csv('_'+file, compression='gzip')
+    df.to_csv('_'+f, compression='gzip')
