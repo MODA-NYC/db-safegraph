@@ -1,16 +1,15 @@
 import pandas as pd
 import os
 
-files = [f for f in os.listdir('.') if f[-3:]=='csv']
+files = [f for f in os.listdir('.') if f[-6:]=='csv.gz']
+print("Python script")
 print("files: ", files)
 
 for f in files:
-    year_month = f[:6]
     print("filename: ", f)
-    print("year-month: ", year_month)
-
-    df = pd.read_csv(f)
+    year_month = f[:6]
+    df = pd.read_csv(file, compression='gzip')
     df['year_month'] = year_month
     print(df.shape)
-
-    df.to_csv(f)
+    print(list(df))
+    df.to_csv('_'+file, compression='gzip')
