@@ -12,4 +12,4 @@ for f in files:
     df['year_month'] = year_month
     print(df.shape)
     print(list(df))
-    df.to_csv('_'+f, compression='gzip')
+    df.to_csv(f, compression='gzip')
