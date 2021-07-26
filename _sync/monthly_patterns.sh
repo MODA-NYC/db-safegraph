@@ -1,7 +1,7 @@
 #!/bin/bash
-SG_BASEPATH_BACKFILL=sg/sg-c19-response/monthly-patterns-2020-12/patterns_backfill
-SG_BASEPATH=sg/sg-c19-response/monthly-patterns-2020-12/patterns
-RDP_BASEPATH=rdp/recovery-data-partnership/monthly_patterns_new
+SG_BASEPATH_BACKFILL=sg/sg-c19-response/monthly-patterns-2020-12/release-2021-07/patterns_backfill
+SG_BASEPATH=sg/sg-c19-response/monthly-patterns-2020-12/release-2021-07/patterns
+RDP_BASEPATH=rdp/recovery-data-partnership/monthly_patterns_202107
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -36,24 +36,23 @@ do
         echo "YEARMONTH: " $YEARMONTH
         
         # 3 months are duplicated between backfill and new data
-        if [ $YEARMONTH != '202011' ] && [ $YEARMONTH != '202012' ] && [ $YEARMONTH != '202101' ]; then
-            if ! [ "$FILENAME" = "_SUCCESS" ]; then
+        # if [ $YEARMONTH != '202011' ] && [ $YEARMONTH != '202012' ] && [ $YEARMONTH != '202101' ]; then
+        if ! [ "$FILENAME" = "_SUCCESS" ]; then
 
-                # Check existence
-                # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
-                STATUS=$(mc stat --json $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME | jq -r '.status')
-                
-                case $STATUS in
-                success)
-                    echo "$KEY is already synced to $YEARMONTH-BF-$FILENAME, skipping ..."
-                ;;
-                error)
-                    # Download data and unzip, remove README.txt and the original .zip file
-                    mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME
-                ;;
-                esac
-            else echo "ignore _SUCCESS"
-            fi
+            # Check existence
+            # STATUS=$(mc stat --json $RDP_BASEPATH/$PARTITION/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME | jq -r '.status')
+            
+            case $STATUS in
+            success)
+                echo "$KEY is already synced to $YEARMONTH-BF-$FILENAME, skipping ..."
+            ;;
+            error)
+                mc cp $SG_BASEPATH_BACKFILL/$KEY $RDP_BASEPATH/$YEARMONTH-BF-$FILENAME
+            ;;
+            esac
+        else echo "ignore _SUCCESS"
+            # fi
         fi
     ) &
 done
@@ -88,7 +87,6 @@ do
                 echo "$KEY is already synced to $PREFIX-$FILENAME, skipping ..."
             ;;
             error)
-                # Download data and unzip, remove README.txt and the original .zip file
                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$PREFIX-$FILENAME
             ;;
             esac
