@@ -39,7 +39,7 @@ do
         echo "YEAR: " $YEAR
         echo "NEW_KEY: " $NEW_KEY
          
-        if [ "${FILENAME#*.}" = "csv.gz" ] || [ "${FILENAME#*.}" = ".csv" ]; then
+        if [ "${FILENAME#*.}" = "csv.gz" ] || [ "${FILENAME#*.}" = "csv" ]; then
             
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
