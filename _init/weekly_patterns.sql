@@ -1,8 +1,6 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns_new (
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns_202107 (
   `placekey` string,
-  `safegraph_place_id` string,
   `parent_placekey` string,
-  `parent_safegraph_place_id` string,
   `location_name` string,
   `street_address` string,
   `city` string,
@@ -19,6 +17,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.weekly_patterns_new (
   `visits_by_each_hour` string,
   `poi_cbg` string,
   `visitor_home_cbgs` string,
+  `visitor_home_aggregation` string,
   `visitor_daytime_cbgs` string,
   `visitor_country_of_origin` string,
   `distance_from_home` string,
@@ -33,7 +32,7 @@ WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/weekly_patterns_new/'
+) LOCATION 's3://recovery-data-partnership/weekly_patterns_202107/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   "skip.header.line.count"="1"
