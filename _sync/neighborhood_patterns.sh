@@ -25,7 +25,8 @@ do
         KEY=$(echo $INFO | jq -r '.key')
         FILENAME=$(basename $KEY)
         PARENT=$(dirname $KEY)
-        GRAMDPARENT=$(dirname $PARENT)
+
+        GRANDPARENT=$(dirname $PARENT)
         MONTH=$(basename $PARENT)
         YEAR=$(basename $GRAMDPARENT)
 
@@ -33,12 +34,12 @@ do
 
         echo "KEY: " $KEY
         echo "PARENT: " $PARENT
-        echo "YEARMONTH: " $GRAMDPARENT
+        echo "GRAMDPARENT: " $GRANDPARENT
         echo "MONTH: " $MONTH
         echo "YEAR: " $YEAR
         echo "NEW_KEY: " $NEW_KEY
          
-        if [ "${FILENAME#*.}" = "csv.gz" ] ; then
+        if [ "${FILENAME#*.}" = "csv.gz" ] || [ "${FILENAME#*.}" = ".csv" ]; then
             
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
@@ -51,7 +52,7 @@ do
                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
             ;;
             esac
-        else echo "ignore $NEW_KEY"
+        else echo "ignore $KEY"
         fi
     ) &
 done
