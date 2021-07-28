@@ -52,7 +52,7 @@ do
             ;;
             esac
 
-        if [ "${FILENAME#*.}" = "csv" ] && [ $DATATYPE = "neighborhood_home_panel_summary" ]; then
+        elif [ "${FILENAME#*.}" = "csv" ] && [ $DATATYPE = "neighborhood_home_panel_summary" ]; then
             
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH_HP/$NEW_KEY | jq -r '.status')
@@ -65,6 +65,7 @@ do
                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH_HP/$NEW_KEY
             ;;
             esac
+
         else echo "ignore $NEW_KEY"
         fi
     ) &
