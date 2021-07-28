@@ -1,5 +1,5 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021/
+SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021/07/07/release-2021-07-01/neighborhood_patterns
 RDP_BASEPATH=rdp/recovery-data-partnership/neighborhood_patterns_202107
 
 function max_bg_procs {
@@ -33,23 +33,20 @@ do
         NEW_KEY=$YEAR-$MONTH-NP.csv.gz
 
         echo "KEY: " $KEY
-        echo "PARENT: " $PARENT
-        echo "GRANDPARENT: " $GRANDPARENT
-        echo "MONTH: " $MONTH
-        echo "YEAR: " $YEAR
-        echo "NEW_KEY: " $NEW_KEY
          
-        if [ "${FILENAME#*.}" = "csv.gz" ] || [ "${FILENAME#*.}" = "csv" ]; then
+        if [ "${FILENAME#*.}" = "csv.gz" ] ; then
             
+            echo $FILENAME
+
             # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+                echo "$KEY is already synced to $KEY, skipping ..."
             ;;
             error)
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
             ;;
             esac
         else echo "ignore $KEY"
