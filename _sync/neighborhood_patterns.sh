@@ -28,13 +28,13 @@ do
 
         GRANDPARENT=$(dirname $PARENT)
         MONTH=$(basename $PARENT)
-        YEAR=$(basename $GRAMDPARENT)
+        YEAR=$(basename $GRANDPARENT)
 
         NEW_KEY=$YEAR-$MONTH-NP.csv.gz
 
         echo "KEY: " $KEY
         echo "PARENT: " $PARENT
-        echo "GRAMDPARENT: " $GRANDPARENT
+        echo "GRANDPARENT: " $GRANDPARENT
         echo "MONTH: " $MONTH
         echo "YEAR: " $YEAR
         echo "NEW_KEY: " $NEW_KEY
