@@ -25,31 +25,37 @@ do
     (
         KEY=$(echo $INFO | jq -r '.key')
         FILENAME=$(basename $KEY)
+
         PATH_MONTH=$(dirname $KEY)
+        KEY_MONTH=$(basename $PATH_MONTH)
+        
         PATH_YEAR=$(dirname $PATH_MONTH)
+        KEY_YEAR=$(basename $PATH_YEAR)
+        
         PATH_DATATYPE=$(dirname $PATH_YEAR)
         DATATYPE=$(basename $PATH_DATATYPE)
 
+        NEW_KEY=$KEY_YEAR/$KEY_MONTH/$FILENAME
+
         echo "KEY: " $KEY
-        echo "PATH_MONTH: " $PATH_MONTH
-        echo "PATH_YEAR: " $PATH_YEAR
-        echo "PATH_DATATYPE: " $PATH_DATATYPE
         echo "DATATYPE: " $DATATYPE
          
         if [ "${FILENAME#*.}" = "csv.gz" ] && [ $DATATYPE = "neighborhood_patterns" ]; then
             
+            echo $NEW_KEY
+
             # Check existence
-            STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
+            STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
             
             case $STATUS in
             success)
-                echo "$KEY is already synced to $KEY, skipping ..."
+                echo "$KEY is already synced to $NEW_KEY, skipping ..."
             ;;
             error)
                 # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
             ;;
             esac
-        else echo "ignore $KEY"
+        else echo "ignore $NEW_KEY"
         fi
     ) &
 done
