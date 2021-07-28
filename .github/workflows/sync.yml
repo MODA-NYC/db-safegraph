@@ -41,6 +41,9 @@ jobs:
       # - name: Sync Social Distancing ...
       #   run: ./sg sync --name social_distancing
 
+      - name: Sync Neighborhood patterns ...
+        run: ./sg sync --name neighborhood_patterns
+
       - name: Sync Weekly Patterns and Home Panel Summary ...
         run: |
          ./sg sync --name weekly_patterns
