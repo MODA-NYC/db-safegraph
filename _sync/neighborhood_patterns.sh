@@ -37,13 +37,8 @@ do
 
         NEW_KEY=$KEY_YEAR/$KEY_MONTH/$FILENAME
 
-        echo "KEY: " $KEY
-        echo "DATATYPE: " $DATATYPE
-         
         if [ "${FILENAME#*.}" = "csv.gz" ] && [ $DATATYPE = "neighborhood_patterns" ]; then
             
-            echo $NEW_KEY
-
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$NEW_KEY | jq -r '.status')
             
@@ -52,7 +47,7 @@ do
                 echo "$KEY is already synced to $NEW_KEY, skipping ..."
             ;;
             error)
-                # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
             ;;
             esac
         else echo "ignore $NEW_KEY"
