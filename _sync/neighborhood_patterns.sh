@@ -2,6 +2,7 @@
 # SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021/07/07/release-2021-07-01/neighborhood_patterns
 SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021
 RDP_BASEPATH=rdp/recovery-data-partnership/neighborhood_patterns_202107
+RDP_BASEPATH_HP=rdp/recovery-data-partnership/neighborhood_home_panel_summary_202107
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -48,6 +49,20 @@ do
             ;;
             error)
                 mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$NEW_KEY
+            ;;
+            esac
+
+        if [ "${FILENAME#*.}" = "csv" ] && [ $DATATYPE = "neighborhood_home_panel_summary" ]; then
+            
+            # Check existence
+            STATUS=$(mc stat --json $RDP_BASEPATH_HP/$NEW_KEY | jq -r '.status')
+            
+            case $STATUS in
+            success)
+                echo "$KEY is already synced to $NEW_KEY, skipping ..."
+            ;;
+            error)
+                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH_HP/$NEW_KEY
             ;;
             esac
         else echo "ignore $NEW_KEY"
