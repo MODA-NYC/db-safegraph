@@ -28,9 +28,12 @@ do
         PATH_MONTH=$(dirname $KEY)
         PATH_YEAR=$(dirname $PATH_MONTH)
         PATH_DATATYPE=$(dirname $PATH_YEAR)
-        DATATYPE=$(basename $PATH_TYPE)
+        DATATYPE=$(basename $PATH_DATATYPE)
 
         echo "KEY: " $KEY
+        echo "PATH_MONTH: " $PATH_MONTH
+        echo "PATH_YEAR: " $PATH_YEAR
+        echo "PATH_DATATYPE: " $PATH_DATATYPE
         echo "DATATYPE: " $DATATYPE
          
         if [ "${FILENAME#*.}" = "csv.gz" ] && [ $DATATYPE = "neighborhood_patterns" ]; then
