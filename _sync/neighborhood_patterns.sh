@@ -1,5 +1,6 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021/07/07/release-2021-07-01/neighborhood_patterns
+# SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021/07/07/release-2021-07-01/neighborhood_patterns
+SG_BASEPATH=sg/sg-c19-response/neighborhood-patterns/neighborhood-patterns/2021
 RDP_BASEPATH=rdp/recovery-data-partnership/neighborhood_patterns_202107
 
 function max_bg_procs {
@@ -24,20 +25,16 @@ do
     (
         KEY=$(echo $INFO | jq -r '.key')
         FILENAME=$(basename $KEY)
-        PARENT=$(dirname $KEY)
-
-        GRANDPARENT=$(dirname $PARENT)
-        MONTH=$(basename $PARENT)
-        YEAR=$(basename $GRANDPARENT)
-
-        NEW_KEY=$YEAR-$MONTH-NP.csv.gz
+        PATH_MONTH=$(dirname $KEY)
+        PATH_YEAR=$(dirname $PATH_MONTH)
+        PATH_DATATYPE=$(dirname $PATH_YEAR)
+        DATATYPE=$(basename $PATH_TYPE)
 
         echo "KEY: " $KEY
+        echo "DATATYPE: " $DATATYPE
          
-        if [ "${FILENAME#*.}" = "csv.gz" ] ; then
+        if [ "${FILENAME#*.}" = "csv.gz" ] && [ $DATATYPE = "neighborhood_patterns" ]; then
             
-            echo $FILENAME
-
             # Check existence
             STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
             
@@ -46,7 +43,7 @@ do
                 echo "$KEY is already synced to $KEY, skipping ..."
             ;;
             error)
-                mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
+                # mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
             ;;
             esac
         else echo "ignore $KEY"
