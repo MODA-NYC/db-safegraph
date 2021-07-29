@@ -50,6 +50,8 @@ do
                 ;;
                 error)
                     mkdir -p tmp
+                    export YEAR_MONTH_FILENAME=$PREFIX-$FILENAME
+                    echo $YEAR_MONTH_FILENAME
                     mc cp $SG_BASEPATH_CORE/$KEY tmp/$PREFIX-$FILENAME
                     (
                         cd tmp
@@ -64,7 +66,7 @@ do
                     )
                     # Transfer data
                     mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                    rm tmp/$PREFIX-$FILENAME                    
+                    rm tmp/$PREFIX-$FILENAME                   
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
                     # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
                     # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
