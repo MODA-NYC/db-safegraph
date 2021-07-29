@@ -1,7 +1,7 @@
 #!/bin/bash
 SG_BASEPATH_CORE=sg/sg-c19-response/core-places-delivery/core_poi
 SG_BASEPATH_BRAND=sg/sg-c19-response/core-places-delivery/brand_info
-RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_202107
+RDP_BASEPATH=rdp/recovery-data-partnership/output/raw/core_poi_202107
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -33,7 +33,7 @@ do
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         # 2020/11 core poi data doesn't have parent_placekey
-        if [ $GGPARENT != '2020/11' ]; then
+        if [ $GGPARENT != '2020/11' ] && [ $PARENT != '2021/07/07/16' ]; then
             if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
                 # Check existence
