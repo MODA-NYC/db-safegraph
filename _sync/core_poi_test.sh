@@ -55,14 +55,7 @@ do
                     mc cp $SG_BASEPATH_CORE/$KEY tmp/$PREFIX-$FILENAME
                     (
                         cd tmp
-                        echo "ls -la on tmp before anything is done"
-                        ls -la
-                        python3 ../core_add_date.py
-                        echo "ls -la on tmp after all is done"
-                        ls -la
-                        # awk -v d="$PREFIX" -F"," 'BEGIN { OFS = "," } {$1=d; print}' $CSVNAME > _$CSVNAME
-                        # rm $CSVNAME
-                        # gzip _$CSVNAME
+                        python3 ../fix_schema.py
                     )
                     # Transfer data
                     mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
