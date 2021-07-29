@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_new2
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_202107
 (
   `placekey` string,
   `parent_placekey` string,
@@ -22,14 +22,14 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_new2
   `closed_on` string,
   `tracking_closed_since` string,
   `geometry_type` string,
-  `year_mont` string
+  `year_month` string
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/core_poi_new2/poi/'
+) LOCATION 's3://recovery-data-partnership/core_poi_202107/poi/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   'compressionType'='gzip',
