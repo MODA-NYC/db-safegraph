@@ -13,9 +13,9 @@ WHERE SUBSTR(poi_cbg,1,5) IN ('36085','36081','36061','36047','36005')
 """
 
 # Load the current quarter
-# quarters = get_quarter()
+quarters = get_quarter()
 
-quarters = PastQs
+# quarters = PastQs
 
 for year_qrtr, range in quarters.items():
     start = range[0]
