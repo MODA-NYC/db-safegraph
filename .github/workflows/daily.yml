@@ -1,8 +1,7 @@
 name: Update daily tables
 
 on:
-  repository_dispatch:
-    types: [daily]
+  workflow_dispatch:
   schedule:
     - cron: 0 1 * * *
 
