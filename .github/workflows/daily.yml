@@ -35,3 +35,13 @@ jobs:
       
       # - name: Update daily_zip_poivisits_by_subsector ...
       #   run: ./sg run --name daily_zip_poivisits_by_subsector
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          mention_users: 'U01RHB6SAQ5,U01J189FNNP'
+          mention_users_when: 'failure,warnings'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
