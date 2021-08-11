@@ -32,11 +32,10 @@ do
         PREFIX=${GGPARENT////}
         # PARTITION="dt=$DATE"
 
-        # if [ "${FILENAME#*.}" = "csv.gz" ]; then
-        #     mc rm $RDP_BASEPATH_LATEST/
-        #     echo "copying the latest file in the directory"
-        #     mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$PREFIX-$FILENAME
-        # fi
+        if [ "${FILENAME#*.}" = "csv.gz" ]; then
+            echo "copying the latest file in the directory"
+            mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$FILENAME
+        fi
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         # 2020/11 core poi data doesn't have parent_placekey
