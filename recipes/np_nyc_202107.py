@@ -16,7 +16,7 @@ today = datetime.date.today()
 next_month = '-'.join([str(today.year),str(today.month+1).zfill(2),'01'])
 print(next_month)
 
-years = list(range(2018,2023))
+years = list(range(2019,2023))
 months = list(range(1,13))
 
 for y in years:
@@ -30,6 +30,6 @@ for y in years:
             aws.execute_query(
                 query=query.format(start, end), 
                 database="safegraph", 
-                output=f"output/dev/wp_NYC/neighborhood_patterns_NYC_{data_month}.csv.zip"
+                output=f"output/dev/np_NYC/neighborhood_patterns_NYC_{data_month}.csv.zip"
             )
 
