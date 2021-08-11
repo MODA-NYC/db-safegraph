@@ -1,5 +1,5 @@
 #!/bin/bash
-SG_BASEPATH_BACKFILL=sg/sg-c19-response/weekly-patterns-delivery-2020-12-backfill/release-2021-07/weekly/patterns_backfill
+SG_BASEPATH_BACKFILL=sg/sg-c19-response/weekly-patterns-delivery-2020-12/release-2021-07/weekly/patterns_backfill
 SG_BASEPATH=sg/sg-c19-response/weekly-patterns-delivery-2020-12/release-2021-07/weekly/patterns
 RDP_BASEPATH=rdp/recovery-data-partnership/weekly_patterns_202107
 
