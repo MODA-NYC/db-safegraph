@@ -33,7 +33,7 @@ do
         # PARTITION="dt=$DATE"
 
         if [ "${FILENAME#*.}" = "csv.gz" ]; then
-            rm $RDP_BASEPATH_LATEST/*
+            mc rm $RDP_BASEPATH_LATEST/
             echo "copying the latest file in the directory"
             mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$PREFIX-$FILENAME
         fi
