@@ -32,16 +32,8 @@ do
         PREFIX=${GGPARENT////}
         # PARTITION="dt=$DATE"
 
-        if [ -d "$RDP_BASEPATH_LATEST" ]; then
-            echo "directory exists. removing all files"
-            mc rm $RDP_BASEPATH_LATEST/*
-        else
-            echo "Error: ${RDP_BASEPATH_LATEST} not found. Can not continue."
-        fi
-
         if [ "${FILENAME#*.}" = "csv.gz" ]; then
-            pwd
-            mc rm $RDP_BASEPATH_LATEST/*
+            rm $RDP_BASEPATH_LATEST/*
             echo "copying the latest file in the directory"
             mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$PREFIX-$FILENAME
         fi
