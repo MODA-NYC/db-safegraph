@@ -2,6 +2,7 @@
 SG_BASEPATH_CORE=sg/sg-c19-response/core-places-delivery/core_poi
 SG_BASEPATH_BRAND=sg/sg-c19-response/core-places-delivery/brand_info
 RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_202107
+RDP_BASEPATH_LATEST=rdp/recovery-data-partnership/core_poi_latest
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -35,6 +36,8 @@ do
         # 2020/11 core poi data doesn't have parent_placekey
         if [ $GGPARENT != '2020/11' ] && [ $PARENT != '2021/07/07/16' ]; then
             if [ "${FILENAME#*.}" = "csv.gz" ]; then
+
+                mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$FILENAME
 
                 # Check existence
                 # STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME | jq -r '.status')
