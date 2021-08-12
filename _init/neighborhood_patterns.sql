@@ -20,7 +20,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.neighborhood_patterns_202107 (
 `work_hours_device_home_areas` string,
 `work_behavior_device_home_areas` string,
 `device_daytime_areas` string,
-`distance_from_home` int,
+`distance_from_home` string,
 `distance_from_primary_daytime_location` int,
 `median_dwell` double,
 `top_same_day_brand` string,
