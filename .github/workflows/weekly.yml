@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [weekly]
   schedule:
-    - cron: 0 1 * * 1
+    - cron: 30 1 * * 4
 
 jobs: 
   Weekly:
@@ -21,17 +21,11 @@ jobs:
       - name: install dependencies ...
         run: pip3 install -r requirements.txt
 
-      - name: Update weekly_county_trips ...
-        run: ./sg run --name weekly_county_trips
-      
-      - name: Update weekly_state_trips ...
-        run: ./sg run --name weekly_state_trips
+      - name: Update neighborhood patterns NYS ...
+        run: ./sg run --name np_ny_202107
 
-      - name: Update weekly_nyc_poivisits ...
-        run: ./sg run --name weekly_nyc_poivisits
-
-      - name: Update weekly_home_panel_summary ...
-        run: ./sg run --name weekly_home_panel_summary
+      - name: Update weekly patterns NYS ...
+        run: ./sg run --name wp_ny_202107
 
       - name: Report Status
         if: always()
