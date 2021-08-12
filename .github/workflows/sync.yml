@@ -49,9 +49,12 @@ jobs:
          ./sg sync --name weekly_patterns
          ./sg sync --name home_panel_summary
 
-      - name: Update weekly patterns NYC ...
-        run: ./sg run --name wp_nyc_202107
-              
+      - name: Update weekly patterns NYS ...
+        run: ./sg run --name wp_ny_202107
+
+      - name: Update Neighborhood patterns NYS ...
+        run: ./sg run --name np_ny_202107
+
       - name: Sync Monthly Patterns ...
         run: ./sg sync --name monthly_patterns
 
