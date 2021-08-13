@@ -32,25 +32,28 @@ cur_day = (today.day)
 # if today is 11th of the month or later. otherwise, it'll pull
 # previous month data.
 
-if (cur_month == 1) and (cur_day < 10):
-    pull_year = cur_year - 1
-    pull_month = 12
-elif cur_day > 10:
-    pull_year = cur_year
-    pull_month = cur_month
-else:
-    pull_year = cur_year
-    pull_month = cur_month-1
-  
+# if (cur_month == 1) and (cur_day < 10):
+#     pull_year = cur_year - 1
+#     pull_month = 12
+# elif cur_day > 10:
+#     pull_year = cur_year
+#     pull_month = cur_month
+# else:
+#     pull_year = cur_year
+#     pull_month = cur_month-1
+
+pull_year = 2021
+pull_month = 7
+
 # pull number of days in a given month
-_, numdays = monthrange(cur_year,cur_month)
+_, numdays = monthrange(pull_year,pull_month)
 
 # create a string yyyy-mm-01 for the beginning of the month
-start = '-'.join([str(cur_year),str(cur_month).zfill(2),'01'])
+start = '-'.join([str(pull_year),str(pull_month).zfill(2),'01'])
 # create a string yyyy-mm-dd for the end of the month
-end = '-'.join([str(cur_year),str(cur_month).zfill(2),str(numdays)])
+end = '-'.join([str(pull_year),str(pull_month).zfill(2),str(numdays)])
 # create a string yyyy-mm
-data_month = '_'.join([str(cur_year),str(cur_month).zfill(2)])
+data_month = '_'.join([str(pull_year),str(pull_month).zfill(2)])
 
 print(f"pulling data for {start} through {end}")
 
