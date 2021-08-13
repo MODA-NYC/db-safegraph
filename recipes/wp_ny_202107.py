@@ -32,18 +32,15 @@ cur_day = (today.day)
 # if today is 11th of the month or later. otherwise, it'll pull
 # previous month data.
 
-# if (cur_month == 1) and (cur_day < 10):
-#     pull_year = cur_year - 1
-#     pull_month = 12
-# elif cur_day > 10:
-#     pull_year = cur_year
-#     pull_month = cur_month
-# else:
-#     pull_year = cur_year
-#     pull_month = cur_month-1
-
-pull_year = 2021
-pull_month = 7
+if (cur_month == 1) and (cur_day < 10):
+    pull_year = cur_year - 1
+    pull_month = 12
+elif cur_day > 10:
+    pull_year = cur_year
+    pull_month = cur_month
+else:
+    pull_year = cur_year
+    pull_month = cur_month-1
 
 # pull number of days in a given month
 _, numdays = monthrange(pull_year,pull_month)
