@@ -1,6 +1,7 @@
 name: Update weekly tables
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types: [weekly]
   schedule:
