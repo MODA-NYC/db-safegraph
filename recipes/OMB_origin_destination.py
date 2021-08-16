@@ -14,11 +14,11 @@ WHERE date_range_start = (SELECT MAX(date_range_start)
                           );
 '''
 output_csv_path =f"output/dev/ops/neighborhood_patterns_US_latest.csv.zip"
-#aws.execute_query(
-#    query=query,
-#    database="safegraph",
-#    output=output_csv_path
-#)
+aws.execute_query(
+    query=query,
+    database="safegraph",
+    output=output_csv_path
+)
                 
     
 #run query on it and get CSV
