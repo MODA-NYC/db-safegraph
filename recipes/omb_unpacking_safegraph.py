@@ -89,6 +89,6 @@ for index, row in df_copy.iterrows():
 df.to_csv( Path(cwd) / 'python_1500_columns.csv')
 
 #upload CSV to AWS S3
-s3.Bucket('recovery-data-partnership').upload_file(str((Path(cwd) / 'python_1500_columns.csv')), 'output/dev/ops/omb_1500_columns.csv')
+s3.Bucket('recovery-data-partnership').upload_file(str((Path(cwd) / 'python_1500_columns.csv')), 'output/dev/omb/omb_1500_columns.csv')
 #aws.move_output(queryLoc=str((Path(cwd) / 'OMB_query_temp.csv')), queryMetadata=None, outputLoc=f"output/dev/ops/OMB_origin_destination.py")
 os.remove('python_1500_columns.csv')
