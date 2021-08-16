@@ -33,6 +33,9 @@ jobs:
       - name: Update weekly_home_panel_summary ...
         run: ./sg run --name weekly_home_panel_summary
 
+      - name: Run OMB origin/destination query ...
+        run: ./sg run --name OMB_origin_destination
+
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@master
