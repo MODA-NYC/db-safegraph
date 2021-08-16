@@ -29,7 +29,10 @@ jobs:
         run: ./sg run --name wp_ny_202107
 
       - name: Run OMB origin/destination query ...
-        run: ./sg run --name OMB_origin_destination
+        run: ./sg run --name omb_origin_destination
+        
+      - name: Run OMB query and unpack hours to 1500 columns ...
+        run: ./sg run --name omb_unpacking_safegraph
 
       - name: Report Status
         if: always()
