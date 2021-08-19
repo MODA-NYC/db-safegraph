@@ -36,7 +36,7 @@ jobs:
         run: ./sg sync --name all
         
       - name: Sync Core POI ...
-        run: ./sg sync --name core_poi_test
+        run: ./sg sync --name core_poi
       
       # - name: Sync Social Distancing ...
       #   run: ./sg sync --name social_distancing
