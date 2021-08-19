@@ -1,7 +1,8 @@
 #!/bin/bash
 SG_BASEPATH_CORE=sg/sg-c19-response/core-places-delivery/core_poi
 SG_BASEPATH_BRAND=sg/sg-c19-response/core-places-delivery/brand_info
-RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_new
+RDP_BASEPATH=rdp/recovery-data-partnership/core_poi_202107
+RDP_BASEPATH_LATEST=rdp/recovery-data-partnership/core_poi_latest
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -28,32 +29,37 @@ do
         PARENT=$(dirname $KEY)
         GPARENT=$(dirname $PARENT)
         GGPARENT=$(dirname $GPARENT)
-        # LOCAL_KEY=tmp/$KEY
-        # LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
-        # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
         # 2020/11 core poi data doesn't have parent_placekey
-        if [ $GGPARENT != '2020/11' ]; then
+        if [ $GGPARENT != '2020/11' ] && [ $PARENT != '2021/07/07/16' ]; then
             if [ "${FILENAME#*.}" = "csv.gz" ]; then
 
+                mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH_LATEST/$FILENAME
+
                 # Check existence
-                # STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME | jq -r '.status')
                 STATUS=$(mc stat --json $RDP_BASEPATH/poi/$PREFIX-$FILENAME | jq -r '.status')
                 
                 case $STATUS in
                 success)
-                    # echo "$KEY is already synced to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME, skipping ..."
                     echo "$KEY is already synced to $RDP_BASEPATH/poi/$PREFIX-$FILENAME, skipping ..."
                 ;;
                 error)
+                    mkdir -p tmp
+                    # save filename to env to read from python
+                    export YEAR_MONTH_FILENAME=$PREFIX-$FILENAME
+                    echo $YEAR_MONTH_FILENAME
+
+                    mc cp $SG_BASEPATH_CORE/$KEY tmp/$PREFIX-$FILENAME
+                    (
+                        cd tmp
+                        python3 ../fix_schema.py
+                    )
                     # Transfer data
-                    echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PREFIX-$FILENAME"
-                    mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PREFIX-$FILENAME
-                    # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME"
-                    # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/poi/$PARTITION/$PREFIX-$FILENAME
+                    mc cp tmp/$PREFIX-$FILENAME $RDP_BASEPATH/poi/$PREFIX-$FILENAME
+                    rm tmp/$PREFIX-$FILENAME                   
                  ;;
                 esac
             else echo "ignore $FILENAME"
@@ -73,10 +79,7 @@ do
         PARENT=$(dirname $KEY)
         GPARENT=$(dirname $PARENT)
         GGPARENT=$(dirname $GPARENT)
-        # LOCAL_KEY=tmp/$KEY
-        # LOCAL_PARENT=$(dirname $LOCAL_KEY)
         PREFIX=${GGPARENT////}
-        # DATE=$(python3 -c "print('$GGPARENT'.replace('/', '-')+'-01')")
         # PARTITION="dt=$DATE"
 
         # SafeGraph mistakingly uploaded '2020/11/06/11/brand_info.csv' and instructed us to ignore.
@@ -94,8 +97,6 @@ do
                 ;;
                 error)
                     # Transfer data
-                    # echo "Copy $SG_BASEPATH_CORE/$KEY to $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv"
-                    # mc cp $SG_BASEPATH_CORE/$KEY $RDP_BASEPATH/brand_info/$PARTITION/$PREFIX-brand_info.csv
                     echo "Copy $SG_BASEPATH_BRAND/$KEY to $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv"
                     mc cp $SG_BASEPATH_BRAND/$KEY $RDP_BASEPATH/brand_info/$PREFIX-brand_info.csv
                 ;;

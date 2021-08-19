@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_202107
+CREATE EXTERNAL TABLE IF NOT EXISTS safegraph.core_poi_latest
 (
   `placekey` string,
   `parent_placekey` string,
@@ -29,7 +29,7 @@ WITH SERDEPROPERTIES (
   'serialization.format' = ',',
   'field.delim' = ',',
   'quoteChar' = '"'
-) LOCATION 's3://recovery-data-partnership/core_poi_202107/poi/'
+) LOCATION 's3://recovery-data-partnership/core_poi_latest/'
 TBLPROPERTIES (
   'has_encrypted_data'='false',
   'compressionType'='gzip',
