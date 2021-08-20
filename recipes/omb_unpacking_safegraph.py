@@ -88,11 +88,12 @@ for index, row in df_copy.iterrows():
     h = 0
     for i in range(0, len(row_hours)):
         #cycle days and hours to be readable
-        h = h + 1
+        
         if (i % 24 == 0):
             d = d + 1
             h = 0
         col_name = "stopsD{}H{}".format(d, h)
+        h = h + 1
         #make a column for every hour of the month!
         if (col_name not in df.columns.to_list()):
             df[col_name] = row_hours[i] 
@@ -101,13 +102,13 @@ for index, row in df_copy.iterrows():
     row_pop_hours = json.loads(row['popularity_by_each_hour'])
     d = 0
     h = 0
-    for i in range(0, len(row_pop_hours)):
-        h = h + 1
+    for i in range(0, len(row_pop_hours)):       
         if (i % 24 == 0):
             d = d + 1
             h = 0
         col_name = "popularityD{}H{}".format(d, h)
         #make a column for populartity for every hour of the month!
+        h = h + 1
         if (col_name not in df.columns.to_list()):
             df[col_name] = row_pop_hours[i] 
         else:
