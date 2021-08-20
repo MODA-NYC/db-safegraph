@@ -36,7 +36,35 @@ s3.Bucket('recovery-data-partnership').download_file('output/dev/ops/neighborhoo
 df = pd.read_csv(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")
 os.remove(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")   
 
-df = df.drop(columns=['area_type', 'origin_area_type', 'date_range_end', 'day_counts', 'weekday_device_home_areas', 'weekend_device_home_areas', 'breakfast_device_home_areas', 'lunch_device_home_areas', 'afternoon_tea_device_home_areas', 'dinner_device_home_areas', 'nightlife_device_home_areas', 'work_hours_device_home_areas', 'work_behavior_device_home_areas', 'device_daytime_areas', 'distance_from_home', 'distance_from_primary_daytime_location', 'top_same_day_brand', 'top_same_month_brand', 'popularity_by_hour_monday', 'popularity_by_hour_tuesday', 'popularity_by_hour_wednesday', 'popularity_by_hour_thursday', 'popularity_by_hour_friday', 'popularity_by_hour_saturday', 'popularity_by_hour_sunday', 'device_type', 'iso_country_code', 'region'])
+df = df.drop(columns=['area_type', 
+                      'origin_area_type', 
+                      'date_range_end', 
+                      'day_counts', 
+                      'weekday_device_home_areas', 
+                      'weekend_device_home_areas', 
+                      'breakfast_device_home_areas', 
+                      'lunch_device_home_areas', 
+                      'afternoon_tea_device_home_areas', 
+                      'dinner_device_home_areas', 
+                      'nightlife_device_home_areas', 
+                      'work_hours_device_home_areas', 
+                      'work_behavior_device_home_areas', 
+                      'device_daytime_areas', 
+                      'distance_from_home', 
+                      'distance_from_primary_daytime_location', 
+                      'top_same_day_brand', 
+                      'top_same_month_brand', 
+                      'popularity_by_hour_monday', 
+                      'popularity_by_hour_tuesday', 
+                      'popularity_by_hour_wednesday', 
+                      'popularity_by_hour_thursday', 
+                      'popularity_by_hour_friday', 
+                      'popularity_by_hour_saturday', 
+                      'popularity_by_hour_sunday', 
+                      'device_type', 
+                      'iso_country_code', 
+                      'region'
+                      ])
 
 def number_of_days_in_month(year, month):
     return monthrange(year, month)[1]
@@ -90,5 +118,4 @@ df.to_csv( Path(cwd) / 'python_1500_columns.csv')
 
 #upload CSV to AWS S3
 s3.Bucket('recovery-data-partnership').upload_file(str((Path(cwd) / 'python_1500_columns.csv')), 'output/dev/omb/omb_1500_columns.csv')
-#aws.move_output(queryLoc=str((Path(cwd) / 'OMB_query_temp.csv')), queryMetadata=None, outputLoc=f"output/dev/ops/OMB_origin_destination.py")
 os.remove('python_1500_columns.csv')
