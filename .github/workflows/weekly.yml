@@ -34,6 +34,9 @@ jobs:
       - name: Run OMB query and unpack hours to 1500 columns ...
         run: ./sg run --name omb_unpacking_safegraph
 
+      - name: Run NYC points of interests (for everyone but under parks) ...
+        run: ./sg run --name nyc_poi_weekly
+
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@master

@@ -118,5 +118,6 @@ for index, row in df_copy.iterrows():
 df.to_csv( Path(cwd) / 'python_1500_columns.csv')
 
 #upload CSV to AWS S3
+print('uploading 1500 columns csv')
 s3.Bucket('recovery-data-partnership').upload_file(str((Path(cwd) / 'python_1500_columns.csv')), 'output/dev/omb/omb_1500_columns.csv')
 os.remove('python_1500_columns.csv')
