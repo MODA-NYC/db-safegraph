@@ -33,7 +33,6 @@ df = pd.read_csv(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")
 os.remove(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 from calendar import monthrange
 import json
 

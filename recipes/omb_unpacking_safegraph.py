@@ -1,13 +1,13 @@
 import os
 import pandas as pd
 from pathlib import Path
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from calendar import monthrange
 import json
 import boto3
 
 
-load_dotenv()
+#load_dotenv()
 cwd = Path(os.getcwd())
 
 query = '''
