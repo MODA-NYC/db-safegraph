@@ -16,11 +16,12 @@ date_query ='''
 '''
 output_date_path = f"output/dev/parks/latest_date.csv"
 #make sure to uncomment this in production.
+'''
 print('executing latest date query')
 aws.execute_query(query=date_query,
                   database="safegraph",
                   output=output_date_path)
-
+'''
 
 #run query on it and get CSV
 s3 = boto3.resource('s3')
