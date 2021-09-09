@@ -50,7 +50,7 @@ aws.execute_query(
     database="safegraph",
     output=output_csv_path
 )
-output_csv_path_2 = "output/dev/parks/{}.csv.zip".format(latest_date)
+output_csv_path_2 = "output/dev/parks/nyc_weekly_patterns_{}.csv.zip".format(latest_date)
 aws.execute_query(
     query=query,
     database="safegraph",
