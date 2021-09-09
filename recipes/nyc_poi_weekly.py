@@ -28,12 +28,12 @@ s3 = boto3.resource('s3')
 cwd = os.getcwd()
 s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
 print('downloading latest date')
-s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv', str(Path('tmp') / "latest_date.csv"))
+s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv', str(Path(cwd) / "latest_date.csv"))
 print('reading latest date')
-df = pd.read_csv(Path('tmp') / "latest_date.csv")
+df = pd.read_csv(Path(cwd) / "latest_date.csv")
 latest_date = df['max_date'][0][:10]
 print('removing latest date')
-os.remove(Path('tmp') / "latest_date.csv")
+os.remove(Path(cwd) / "latest_date.csv")
 print('max date: "{}"'.format(latest_date))
 
 query = '''
