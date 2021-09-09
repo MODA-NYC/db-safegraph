@@ -14,7 +14,7 @@ date_query ='''
   SELECT MAX(date_range_start) as max_date
   FROM weekly_patterns_202107;
  '''
-output_date_path = f"output/dev/parks/latest_date.csv"
+output_date_path = f"output/dev/parks/latest_date.csv.zip"
 print("output_date_path: {}".format(output_date_path))
 #make sure to uncomment this in production.
 
