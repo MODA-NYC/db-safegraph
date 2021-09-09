@@ -15,7 +15,7 @@ date_query ='''
   FROM weekly_patterns_202107;
  '''
 output_date_path = f"output/dev/parks/latest_date.csv"
-
+print("output_date_path: {}".format(output_date_path))
 #make sure to uncomment this in production.
 
 print('executing latest date query')
