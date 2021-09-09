@@ -16,6 +16,7 @@ date_query ='''
 '''
 output_date_path = f"output/dev/parks/latest_date.csv"
 #make sure to uncomment this in production.
+print('executing latest date query')
 aws.execute_query(query=date_query,
                   database="safegraph",
                   output=output_date_path)
@@ -25,11 +26,13 @@ aws.execute_query(query=date_query,
 s3 = boto3.resource('s3')
 cwd = os.getcwd()
 s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
-s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv', str(Path(cwd) / "latest_date.csv"))
-
-df = pd.read_csv(Path(cwd) / "latest_date.csv")
+print('downloading latest date')
+s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv', str(Path('tmp') / "latest_date.csv"))
+print('reading latest date')
+df = pd.read_csv(Path('tmp') / "latest_date.csv")
 latest_date = df['max_date'][0][:10]
-os.remove(Path(cwd) / "latest_date.csv")
+print('removing latest date')
+os.remove(Path('tmp') / "latest_date.csv")
 print('max date: "{}"'.format(latest_date))
 
 query = '''
