@@ -29,12 +29,12 @@ s3 = boto3.resource('s3')
 cwd = os.getcwd()
 s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
 print('downloading latest date')
-s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv', str(Path(cwd) / "latest_date.csv"))
+s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv.zip', str(Path(cwd) / "latest_date.csv.zip"))
 print('reading latest date')
-df = pd.read_csv(Path(cwd) / "latest_date.csv")
+df = pd.read_csv(Path(cwd) / "latest_date.csv.zip")
 latest_date = df['max_date'][0][:10]
 print('removing latest date')
-os.remove(Path(cwd) / "latest_date.csv")
+os.remove(Path(cwd) / "latest_date.csv.zip")
 print('max date: "{}"'.format(latest_date))
 
 query = '''
@@ -43,7 +43,7 @@ WHERE substr(date_range_start, 1, 10) = '{}'
 AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085');
 '''.format(latest_date)
 
-output_csv_path = f"output/dev/parks/nyc_weekly_patterns_latest.csv.zip"
+output_csv_path = "output/dev/parks/nyc_weekly_patterns_latest.csv.zip"
 #make sure to uncomment this in production
 aws.execute_query(
     query=query,
@@ -70,7 +70,7 @@ WHERE substr(hps.date_range_start, 1, 10) = '{}'
 #we want to include the entire census for multipliers (out of state visitors)
 #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
-output_csv_path = f"output/dev/parks/pop_to_device_multiplier.csv"
+output_csv_path = f"output/dev/parks/pop_to_device_multiplier.csv.zip"
 #uncomment in production
 aws.execute_query(
     query=query,
@@ -78,9 +78,9 @@ aws.execute_query(
     output=output_csv_path
 )
 
-s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv", str(Path(cwd) / 'multiplier_temp.csv'))
+s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv", str(Path(cwd) / 'multiplier_temp.csv.zip'))
 
-df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv', dtype={'cbg': object})
+df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': object})
 
 ##### join census to cbg to weekly patterns and multiply #####
 df = pd.read_csv(Path(cwd) / "nyc_weekly_patterns_latest.csv.zip" )
