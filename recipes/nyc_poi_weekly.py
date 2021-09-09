@@ -14,6 +14,7 @@ date_query ='''
   SELECT MAX(date_range_start) as max_date
   FROM weekly_patterns_202107;
  '''
+#must be a zip file or _helper.aws will break
 output_date_path = f"output/dev/parks/latest_date.csv.zip"
 print("output_date_path: {}".format(output_date_path))
 #make sure to uncomment this in production.
@@ -22,7 +23,7 @@ print('executing latest date query')
 aws.execute_query(query=date_query,
                   database="safegraph",
                   output=output_date_path)
-raise
+
 #run query on it and get CSV
 s3 = boto3.resource('s3')
 cwd = os.getcwd()
