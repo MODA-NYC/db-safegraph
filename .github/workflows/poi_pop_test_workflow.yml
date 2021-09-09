@@ -1,0 +1,48 @@
+name: Update weekly tables
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [weekly]
+  schedule:
+    - cron: 30 1 * * 4
+
+jobs: 
+  Weekly:
+    runs-on: ubuntu-latest
+    env:
+      RDP_S3_ENDPOINT: https://s3.amazonaws.com 
+      RDP_ACCESS_KEY_ID: ${{ secrets.RDP_ACCESS_KEY_ID }}
+      RDP_SECRET_ACCESS_KEY: ${{ secrets.RDP_SECRET_ACCESS_KEY }}
+      AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies ...
+        run: pip3 install -r requirements.txt
+
+      - name: Update neighborhood patterns NYS ...
+        run: ./sg run --name np_ny_202107
+
+      - name: Update weekly patterns NYS ...
+        run: ./sg run --name wp_ny_202107
+
+      - name: Run OMB origin/destination query ...
+        run: ./sg run --name OMB_origin_destination
+        
+      - name: Run OMB query and unpack hours to 1500 columns ...
+        run: ./sg run --name omb_unpacking_safegraph
+
+      - name: Run NYC points of interests (for everyone but under parks) ...
+        run: ./sg run --name nyc_poi_weekly
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          mention_users: 'U01RHB6SAQ5,U01J189FNNP'
+          mention_users_when: 'failure,warnings'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
