@@ -14,7 +14,7 @@ date_query ='''
   SELECT MAX(date_range_start) as max_date
   FROM weekly_patterns_202107;
  '''
-#must be a zip file or _helper.aws will break
+#can only upload as a a zip file or _helper.aws will break
 output_date_path = f"output/dev/parks/latest_date.csv.zip"
 print("output_date_path: {}".format(output_date_path))
 #make sure to uncomment this in production.
@@ -78,7 +78,7 @@ aws.execute_query(
     output=output_csv_path
 )
 
-s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv", str(Path(cwd) / 'multiplier_temp.csv.zip'))
+s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
 
 df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': object})
 
