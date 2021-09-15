@@ -16,6 +16,7 @@ date_query ='''
 '''
 output_date_path = f"output/dev/parks/latest_date.csv"
 #make sure to uncomment this in production.
+
 aws.execute_query(query=date_query,
                   database="safegraph",
                   output=output_date_path)
@@ -60,18 +61,19 @@ SELECT hps.date_range_start as my_date_range_start, hps.census_block_group as cb
 FROM home_panel_summary_202107 AS hps
 INNER JOIN census on hps.census_block_group = census.census_block_group
 WHERE substr(hps.date_range_start, 1, 10) = '{}'
-
 '''.format(latest_date)
 #we want to include the entire census for multipliers (out of state visitors)
 #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
 output_csv_path = f"output/dev/parks/pop_to_device_multiplier.csv"
 #uncomment in production
+
 aws.execute_query(
     query=query,
     database="safegraph",
     output=output_csv_path
 )
+
 
 s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv", str(Path(cwd) / 'multiplier_temp.csv'))
 
@@ -146,14 +148,24 @@ df['pop_multiplier'] = multiplier_list
 
 print(df.info())
 df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
-s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count.csv")
+s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count_latest.csv")
+save_path="output/dev/parks/poi_with_population_count_{}.csv".format(latest_date)
+
+s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), save_path)
 
 df_ans = pd.read_csv('poi_weekly_pop_added.csv')
-print(df_ans.info())
-print(df_ans.head(20))
+#print(df_ans.info())
+#print(df_ans.head(20))
 
-
+park_placekey_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
+#df_parks = df_ans.loc[df_ans['placekey'] in park_placekey_df['placekey'], :]
+df_parks = df_ans.merge(park_placekey_df, left_on='placekey', right_on='placekey', how='right') 
+df_parks.to_csv(Path(cwd) / 'parks_slice_poi.csv')
+s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'parks_slice_poi.csv'), 'output/dev/parks/parks-slice-poi-latest.csv')
+save_path = "output/dev/parks/parks-slice-poi-{}".format(latest_date)
+s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'parks_slice_poi.csv'), save_path)
 #uncomment in production
+
 #os.remove(Path(cwd) / 'nyc_weekly_patterns_latest.csv.zip')
 #os.remove(Path(cwd) / 'census_tmp.csv')
 #os.remove(Path(cwd) / 'multiplier_temp.csv')
