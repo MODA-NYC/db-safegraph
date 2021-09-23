@@ -95,7 +95,9 @@ df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': objec
 ##### join census to cbg to weekly patterns and multiply #####
 df = pd.read_csv(Path(cwd) / "nyc_weekly_patterns_latest.csv.zip" )
 # for each row in the dataframe
-
+if ((len(df) == 0) or (len(df_mult) == 0)) :
+    raise("Either the home panel summary or the weekly patterns were not found")
+    
 visitors_pop_list = []
 visits_pop_list = []
 multiplier_list = []
@@ -162,6 +164,8 @@ if is_prod:
     print(df.info())
     df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
     s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
+
     
 df_ans = pd.read_csv('poi_weekly_pop_added.csv')
 #print(df_ans.info())
@@ -174,6 +178,7 @@ parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
 
 #df_parks = df_ans.join(parks_poi_df, on='placekey', how='right')
+
 df_parks = pd.merge(parks_poi_df, df_ans, how='left', on='placekey')
 print(df_parks.head(5))
 
