@@ -7,49 +7,29 @@ import json
 import warnings
 from datetime import datetime
 import time
+import numpy as np
+from multiprocessing import log_to_stderr
+from multiprocessing import Pool
+import logging
+import sys
 
 is_prod = True
-start_time = time.perf_counter()
-print("start time is {}".format(datetime.now()))
-date_query ='''
-  SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
-  FROM hps_crawled22
-  ORDER BY date_range_start ASC;
- '''
-#can only upload as a a zip file or _helper.aws will break
-output_date_path = f"output/dev/parks/latest_date.csv.zip"
-print("output_date_path: {}".format(output_date_path))
-#make sure to uncomment this in production.
-if is_prod:
-    print('executing latest date query')
-    aws.execute_query(query=date_query,
-                  database="safegraph",
-                  output=output_date_path)
+n_cores = 3
 
-#run query on it and get CSV
-s3 = boto3.resource('s3')
-cwd = os.getcwd()
-s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
-print('downloading latest date')
-if is_prod:
-    s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv.zip', str(Path(cwd) / "latest_date.csv.zip"))
-
-print('reading latest date')
-
-dates_df = pd.read_csv(Path(cwd) / "latest_date.csv.zip")
 #loop through the dates.
-for index, row in dates_df.iterrows():
+def main(row):
     latest_date = row['date_range_start'][:10]
     
-    print('for date: "{}"'.format(latest_date))
+    warnings.info('for date: "{}"'.format(latest_date))
     
     query = '''
     SELECT * FROM weekly_patterns_202107 
     WHERE substr(date_range_start, 1, 10) = '{}'        
-    AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085');
+    AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085')
+    
     '''.format(latest_date)
     
-    output_csv_path_2 = "output/dev/parks/nyc_weekly_patterns_{}.csv.zip".format(latest_date)
+    output_csv_path_2 = 'output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date)
     if is_prod:
         aws.execute_query(
             query=query,
@@ -58,7 +38,7 @@ for index, row in dates_df.iterrows():
         )
     
     
-        s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / 'nyc_weekly_patterns_temp.csv.zip'))
+        s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip'))
     
     ##### get multiplier #####
     
@@ -72,7 +52,7 @@ for index, row in dates_df.iterrows():
     #we want to include the entire census for multipliers (out of state visitors)
     #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
     
-    output_csv_path = f"output/dev/parks/pop_to_device_multiplier.csv.zip"
+    output_csv_path = f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip'
     #uncomment in production
     if is_prod:
         aws.execute_query(
@@ -82,24 +62,25 @@ for index, row in dates_df.iterrows():
         )
     
     
-    s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
+    s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
     
-    df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': object})
+    df_mult = pd.read_csv(Path(cwd) / 'fmultiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
     #print(df_mult.info())
     #print(df_mult.head())
     #works
 
     ##### join census to cbg to weekly patterns and multiply #####
-    df = pd.read_csv(Path(cwd) / "nyc_weekly_patterns_temp.csv.zip" )
+    df = pd.read_csv(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip' )
     # for each row in the dataframe
     if ((len(df) == 0) or (len(df_mult) == 0)) :
-        print("Either the home panel summary or the weekly patterns were not found")
-        continue
+        warnings.warn(f"{latest_date} Either the home panel summary or the weekly patterns were not found")
+        return f"{latest_date} data not found."
     
 
     visitors_pop_list = []
     visits_pop_list = []
     multiplier_list = []
+    sys.stdout.flush()
     if is_prod:
         for index, row in df.iterrows():
             #read the visitor home cbgs and parse json
@@ -134,21 +115,32 @@ for index, row in dates_df.iterrows():
     
                 except IndexError:
                 
-                    #warning_message = 'warning: there is no row zero for key {}'.format(key)
-                    #warnings.warn(warning_message)
+                    warning_message = 'warning: there is no row zero for key {}'.format(key)
+                    warnings.info(warning_message)
                     no_match_count = no_match_count + value
                     no_match_count_rows = no_match_count_rows + 1
                     #if no multiplier, pop_count stays the same. Added back after the loop.
                     multiplier = 0
                     cbg_pop = 0
                     devices_residing = 0
-                pop_calc = pop_count + multiplier * value * 1.0
+                #this is done below. see synthtetic mult.
+                #pop_calc = pop_count + multiplier * value * 1.0
                 sum_cbg_pop = sum_cbg_pop + cbg_pop
                 sum_cbg_devices = sum_cbg_devices + devices_residing
+                sys.stdout.flush()
             #to fill in the missing values (i.e. Canada) take the average population of the other cbgs
             no_zero_lambda_func = (lambda x : x if x > 0 else 1)
-    
             synthetic_mult = sum_cbg_pop / no_zero_lambda_func(sum_cbg_devices * 1.0)
+
+            #if mutliplier is zero (for small visit counts without home block groups), impute value
+            #don't want to take the average with a value of 0. That is what we are trying to fill.
+            #convert 0 to None and it won't include them in the average.
+            non_zero_multipliers = synthetic_mult.apply(lambda x: x if x > 0 else None)
+            #take the average of all the multipliers.
+            avg_multiplier = np.mean(non_zero_multipliers)
+            #fill multipliers with imputed multiplier.
+            synthetic_mult = synthetic_mult.apply(lambda x: x if x > 0 else avg_multiplier)
+            sys.stdout.flush()
             visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
             visits_pop_count = row['raw_visit_counts'] * synthetic_mult
             #add value to list
@@ -161,12 +153,11 @@ for index, row in dates_df.iterrows():
         df['visitors_pop_calc'] = visitors_pop_list
         df['pop_multiplier'] = multiplier_list
     
-        print(df.info())
-        df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
-        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count.csv")
-        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
-        
-    df_ans = pd.read_csv('poi_weekly_pop_added.csv')
+        warnings.info(df.info())
+        df.to_csv(Path(cwd) /f'poi_weekly_pop_added_{latest_date}.csv')
+        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
+        sys.stdout.flush()
+    df_ans = pd.read_csv(f'poi_weekly_pop_added_{latest_date}.csv')
     #print(df_ans.info())
     #print(df_ans.head(20))
     
@@ -188,13 +179,55 @@ for index, row in dates_df.iterrows():
     if is_prod: #uncomment in production
         try:
             os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
-            os.remove(Path(cwd) / 'nyc_weekly_patterns_temp.csv.zip')
-            os.remove(Path(cwd) / 'multiplier_temp.csv.zip')
-            os.remove(Path(cwd) / 'poi_weekly_pop_added.csv')
+            os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
+            os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
+            os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
         except FileNotFoundError:
-            print('file not found to remove')
+            print("file not found to remove")
     print("{} Successfully completed at {}".format(latest_date, datetime.now()))
-end_time = time.perf_counter()
-elapsed_time = end_time - start_time
-time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-print('elapsed time: {}'.format(time_string))
+    return latest_date
+#setup paralell processing:
+if __name__=='__main__':
+    log_to_stderr(logging.DEBUG)
+    start_time = time.perf_counter()
+    print("start time is {}".format(datetime.now()))
+    date_query ='''
+      SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
+      FROM hps_crawled22
+      WHERE substr(date_range_start, 1, 10) > '2018-09-23'
+      ORDER BY date_range_start ASC;
+     '''
+    #can only upload as a a zip file or _helper.aws will break
+    output_date_path = f"output/dev/parks/latest_date.csv.zip"
+    print("output_date_path: {}".format(output_date_path))
+    #make sure to uncomment this in production.
+    if is_prod:
+        print('executing latest date query')
+        aws.execute_query(query=date_query,
+                      database="safegraph",
+                      output=output_date_path)
+
+    #run query on it and get CSV
+    s3 = boto3.resource('s3')
+    cwd = os.getcwd()
+    s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
+    print('downloading latest date')
+    if is_prod:
+        s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/latest_date.csv.zip', str(Path(cwd) / "latest_date.csv.zip"))
+
+    print('reading latest date')
+
+    dates_df = pd.read_csv(Path(cwd) / "latest_date.csv.zip")
+
+
+
+    date_list_split = np.array_split(dates_df, n_cores)
+    pool = Pool(n_cores)
+    return_series = pd.concat(pool.map(main, dates_df))
+    pool.close()
+    pool.join()
+    print(f"return series: {return_series}")
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+    time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+    print("elapsed time: {}".format(time_string))
