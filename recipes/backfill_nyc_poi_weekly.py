@@ -14,181 +14,195 @@ import logging
 import sys
 
 is_prod = True
-n_cores = 3
+n_cores = 15
 
 #loop through the dates.
-def main(row):
-    latest_date = row['date_range_start'][:10]
-    
-    warnings.info('for date: "{}"'.format(latest_date))
-    
-    query = '''
-    SELECT * FROM weekly_patterns_202107 
-    WHERE substr(date_range_start, 1, 10) = '{}'        
-    AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085')
-    
-    '''.format(latest_date)
-    
-    output_csv_path_2 = 'output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date)
-    if is_prod:
-        aws.execute_query(
-            query=query,
-            database="safegraph",
-            output=output_csv_path_2
-        )
-    
-    
-        s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip'))
-    
-    ##### get multiplier #####
-    
-    query = '''
-    SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
-    FROM hps_crawled22 AS hps
-    INNER JOIN census on hps.census_block_group = census.census_block_group
-    WHERE substr(hps.date_range_start, 1, 10) = '{}'
-    
-    '''.format(latest_date)
-    #we want to include the entire census for multipliers (out of state visitors)
-    #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
-    
-    output_csv_path = f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip'
-    #uncomment in production
-    if is_prod:
-        aws.execute_query(
-            query=query,
-            database="safegraph",
-            output=output_csv_path
-        )
-    
-    
-    s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
-    
-    df_mult = pd.read_csv(Path(cwd) / 'fmultiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
-    #print(df_mult.info())
-    #print(df_mult.head())
-    #works
+def my_main(split_chunk):
+    s3 = boto3.resource('s3')
+    cwd = os.getcwd()
+    s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
+    #print(f"split chunk of rows: {split_chunk_of_rows.info()}")
+    for my_date in split_chunk:
+        latest_date = my_date
+        warnings.warn('for date: "{}"'.format(latest_date))
 
-    ##### join census to cbg to weekly patterns and multiply #####
-    df = pd.read_csv(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip' )
-    # for each row in the dataframe
-    if ((len(df) == 0) or (len(df_mult) == 0)) :
-        warnings.warn(f"{latest_date} Either the home panel summary or the weekly patterns were not found")
-        return f"{latest_date} data not found."
-    
+        query = '''
+        SELECT * FROM weekly_patterns_202107 
+        WHERE substr(date_range_start, 1, 10) = '{}'        
+        AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085')
 
-    visitors_pop_list = []
-    visits_pop_list = []
-    multiplier_list = []
-    sys.stdout.flush()
-    if is_prod:
-        for index, row in df.iterrows():
-            #read the visitor home cbgs and parse json
-            #print(row['visitor_home_cbgs'])
-            iter = 0
-    
-            pop_count = 0.0
-            no_match_count = 0
-            no_match_count_rows = 0
-            sum_cbg_pop = 0
-            sum_cbg_devices = 0
-    
-            this_json = json.loads(row['visitor_home_cbgs'])
-            #for each item in the dictionary
-            for key, value in this_json.items():
-                #multiply devices by people per device table
-                iter = iter + 1
-                selected_rows = df_mult.iloc[:, df_mult.columns.get_loc('cbg')] == key
-                #filter df_mult
-                selected_rows_mult_df = df_mult[selected_rows]
-                #isolate multiplier
-                try:
-                    #take the first row. should only be one match. Need to get this check working.
-                    if len(selected_rows_mult_df[selected_rows_mult_df['cbg'] == key]) > 1:
-                        warning_message = "more than one match for key {}".format(key)
-                        warnings.warn(warning_message)
-                    multiplier = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('pop_multiplier')]
-                    cbg_pop = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('cbg_pop')]
-                    devices_residing = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('devices_residing')]
-    
-    
-    
-                except IndexError:
-                
-                    warning_message = 'warning: there is no row zero for key {}'.format(key)
-                    warnings.info(warning_message)
-                    no_match_count = no_match_count + value
-                    no_match_count_rows = no_match_count_rows + 1
-                    #if no multiplier, pop_count stays the same. Added back after the loop.
-                    multiplier = 0
-                    cbg_pop = 0
-                    devices_residing = 0
-                #this is done below. see synthtetic mult.
-                #pop_calc = pop_count + multiplier * value * 1.0
-                sum_cbg_pop = sum_cbg_pop + cbg_pop
-                sum_cbg_devices = sum_cbg_devices + devices_residing
+        '''.format(latest_date)
+
+        output_csv_path_2 = 'output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date)
+        if is_prod:
+            aws.execute_query(
+                query=query,
+                database="safegraph",
+                output=output_csv_path_2
+            )
+
+
+            s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip'))
+
+        ##### get multiplier #####
+
+        query = '''
+        SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
+        FROM hps_crawled22 AS hps
+        INNER JOIN census on hps.census_block_group = census.census_block_group
+        WHERE substr(hps.date_range_start, 1, 10) = '{}'
+
+        '''.format(latest_date)
+        #we want to include the entire census for multipliers (out of state visitors)
+        #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
+
+        output_csv_path = f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip'
+        #uncomment in production
+        if is_prod:
+            aws.execute_query(
+                query=query,
+                database="safegraph",
+                output=output_csv_path
+            )
+
+
+        s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
+
+        df_mult = pd.read_csv(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
+        #print(df_mult.info())
+        #print(df_mult.head())
+        #works
+
+        ##### join census to cbg to weekly patterns and multiply #####
+        df = pd.read_csv(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip' )
+        # for each row in the dataframe
+        if ((len(df) == 0) or (len(df_mult) == 0)) :
+            warnings.warn(f"{latest_date} Either the home panel summary or the weekly patterns were not found")
+            continue
+
+        multiplier_list = []
+        sys.stdout.flush()
+        sys.stderr.flush()
+        if is_prod:
+            
+            for index, row in df.iterrows():
+                iter = 0
+                pop_count = 0.0
+                #no_match_count isn't being used in prod.
+                no_match_count = 0
+                no_match_count_rows = 0
+                sum_cbg_pop = 0
+                sum_cbg_devices = 0
+
+                this_json = json.loads(row['visitor_home_cbgs'])
+                #for each item in the dictionary
+                for key, value in this_json.items():
+                    #multiply devices by people per device table
+                    iter = iter + 1
+                    selected_rows = df_mult.iloc[:, df_mult.columns.get_loc('cbg')] == key
+                    #filter df_mult
+                    selected_rows_mult_df = df_mult[selected_rows]
+                    #isolate multiplier
+                    try:
+                        #take the first row. should only be one match. Need to get this check working.
+                        if len(selected_rows_mult_df[selected_rows_mult_df['cbg'] == key]) > 1:
+                            warning_message = "more than one match for key {}".format(key)
+                            warnings.warn(warning_message)
+                        multiplier = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('pop_multiplier')]
+                        cbg_pop = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('cbg_pop')]
+                        devices_residing = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('devices_residing')]
+
+
+
+                    except IndexError:
+                    
+                        warning_message = 'warning: there is no row zero for key {}'.format(key)
+                        #warnings.warn(warning_message)
+                        #no_match_count isn't being used
+                        no_match_count = no_match_count + value
+                        no_match_count_rows = no_match_count_rows + 1
+                        #if no multiplier, pop_count stays the same. Added back after the loop.
+                        multiplier = 0
+                        cbg_pop = 0
+                        devices_residing = 0
+                    #this is done below. see synthtetic mult.
+                    #pop_calc = pop_count + multiplier * value * 1.0
+                    sum_cbg_pop = sum_cbg_pop + cbg_pop
+                    sum_cbg_devices = sum_cbg_devices + devices_residing
+                    sys.stdout.flush()
+                    sys.stderr.flush()
+                #to fill in the missing values (i.e. Canada) take the average population of the other cbgs
+                no_zero_lambda_func = (lambda x : x if x > 0 else 1)
+                synthetic_mult = sum_cbg_pop / no_zero_lambda_func(sum_cbg_devices * 1.0)
+
+                #if mutliplier is zero (for small visit counts without home block groups)
+               
                 sys.stdout.flush()
-            #to fill in the missing values (i.e. Canada) take the average population of the other cbgs
-            no_zero_lambda_func = (lambda x : x if x > 0 else 1)
-            synthetic_mult = sum_cbg_pop / no_zero_lambda_func(sum_cbg_devices * 1.0)
+                sys.stderr.flush()
+                #visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
+                #visits_pop_count = row['raw_visit_counts'] * synthetic_mult
+                #add value to list
+                #visitors_pop_list.append(visitors_pop_count)
+                #visits_pop_list.append(visits_pop_count)
+                multiplier_list.append(synthetic_mult)
+                #print("final pop count: {}".format(pop_count))
+            
+            
 
-            #if mutliplier is zero (for small visit counts without home block groups), impute value
-            #don't want to take the average with a value of 0. That is what we are trying to fill.
-            #convert 0 to None and it won't include them in the average.
-            non_zero_multipliers = synthetic_mult.apply(lambda x: x if x > 0 else None)
+            
+            non_zero_multipliers =  [x for x in multiplier_list if x > 0]
+            #print(f"non zero multipliers: {non_zero_multipliers}")
             #take the average of all the multipliers.
             avg_multiplier = np.mean(non_zero_multipliers)
             #fill multipliers with imputed multiplier.
-            synthetic_mult = synthetic_mult.apply(lambda x: x if x > 0 else avg_multiplier)
-            sys.stdout.flush()
-            visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
-            visits_pop_count = row['raw_visit_counts'] * synthetic_mult
-            #add value to list
-            visitors_pop_list.append(visitors_pop_count)
-            visits_pop_list.append(visits_pop_count)
-            multiplier_list.append(synthetic_mult)
-            #print("final pop count: {}".format(pop_count))
+            multiplier_list = [x if x > 0 else avg_multiplier for x in multiplier_list]
     
-        df['visits_pop_calc'] = visits_pop_list
-        df['visitors_pop_calc'] = visitors_pop_list
-        df['pop_multiplier'] = multiplier_list
-    
-        warnings.info(df.info())
+            #convert device counts to population counts based on multiplier series.
+            df['pop_multiplier'] = multiplier_list
+            df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
+            df['visitors_pop_calc'] = multiplier_list * df['raw_visitors_counts']
+            warnings.warn(df.head())
+            warnings.warn(df.info())
+            sys.stderr.flush()
+        
+        warnings.warn(df.info())
         df.to_csv(Path(cwd) /f'poi_weekly_pop_added_{latest_date}.csv')
         s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
         sys.stdout.flush()
-    df_ans = pd.read_csv(f'poi_weekly_pop_added_{latest_date}.csv')
-    #print(df_ans.info())
-    #print(df_ans.head(20))
-    
-    #Extract parks data
-    parks_poi_df = pd.read_csv('nyc_parks_pois_keys_082021.csv')
-    df_ans['placekey'] = df_ans['placekey'].astype(str)
-    parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
-    
-    
-    #df_parks = df_ans.join(parks_poi_df, on='placekey', how='right')
-    df_parks = pd.merge(parks_poi_df, df_ans, how='left', on='placekey')
-    print(df_parks.head(5))
-    
-    print('saving parks slice csv')
-    df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
-    
-    
-    if is_prod: #uncomment in production
-        try:
-            os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
-            os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
-            os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
-            os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
-        except FileNotFoundError:
-            print("file not found to remove")
-    print("{} Successfully completed at {}".format(latest_date, datetime.now()))
-    return latest_date
+        sys.stderr.flush()
+        df_ans = pd.read_csv(f'poi_weekly_pop_added_{latest_date}.csv')
+        #print(df_ans.info())
+        #print(df_ans.head(20))
+
+        #Extract parks data
+        parks_poi_df = pd.read_csv('nyc_parks_pois_keys_082021.csv')
+        df_ans['placekey'] = df_ans['placekey'].astype(str)
+        parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
+
+
+        #df_parks = df_ans.join(parks_poi_df, on='placekey', how='right')
+        df_parks = pd.merge(parks_poi_df, df_ans, how='left', on='placekey')
+        print(df_parks.head(5))
+
+        print('saving parks slice csv')
+        df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
+        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
+
+
+        if is_prod: #uncomment in production
+            try:
+                os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
+                os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
+                os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
+                os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
+            except FileNotFoundError:
+                print("file not found to remove")
+        print("{} Successfully completed at {}".format(latest_date, datetime.now()))
+        
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
+    
     start_time = time.perf_counter()
     print("start time is {}".format(datetime.now()))
     date_query ='''
@@ -221,9 +235,25 @@ if __name__=='__main__':
 
 
 
-    date_list_split = np.array_split(dates_df, n_cores)
+    #date_list_split = np.array_split(dates_df, n_cores)
+    #split list in such a way that they are all working on the same dates and increase lowest to high.
+    dates_list = dates_df['date_range_start']
+    def form_lists(n_cores, list):
+        i = 0
+        c = 0
+        ans = [ [] for n in range(n_cores)]
+
+        while i < len(list):
+            ans[ c % n_cores].append(list[i])
+            c = c + 1
+            i = i + 1
+        return [np.array(x) for x in ans]
+    datetime_list = [x[:10] for x in dates_list]
+    date_list_split = form_lists(n_cores, dates_list)
+    print(date_list_split)
+    
     pool = Pool(n_cores)
-    return_series = pd.concat(pool.map(main, dates_df))
+    return_series = pd.concat(pool.map(my_main, date_list_split))
     pool.close()
     pool.join()
     print(f"return series: {return_series}")
