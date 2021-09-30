@@ -14,7 +14,7 @@ import logging
 import sys
 
 is_prod = True
-n_cores = 15
+n_cores = 16
 
 #loop through the dates.
 def my_main(split_chunk):
@@ -160,7 +160,7 @@ def my_main(split_chunk):
             #convert device counts to population counts based on multiplier series.
             df['pop_multiplier'] = multiplier_list
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
-            df['visitors_pop_calc'] = multiplier_list * df['raw_visitors_counts']
+            df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
             warnings.warn(df.head())
             warnings.warn(df.info())
             sys.stderr.flush()
