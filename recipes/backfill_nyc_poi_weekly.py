@@ -161,11 +161,11 @@ def my_main(split_chunk):
             df['pop_multiplier'] = multiplier_list
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
             df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
-            warnings.warn(df.head())
-            warnings.warn(df.info())
+            warnings.warn(str(df.head(5)))
+            print(df.info())
             sys.stderr.flush()
 
-        warnings.warn(df.info())
+        print(df.info())
         df.to_csv(Path(cwd) /f'poi_weekly_pop_added_{latest_date}.csv')
         s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
         sys.stdout.flush()
@@ -182,7 +182,7 @@ def my_main(split_chunk):
 
         #df_parks = df_ans.join(parks_poi_df, on='placekey', how='right')
         df_parks = pd.merge(parks_poi_df, df_ans, how='left', on='placekey')
-        print(df_parks.head(5))
+        print(df_parks.head(6))
 
         print('saving parks slice csv')
         df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
@@ -198,6 +198,8 @@ def my_main(split_chunk):
             except FileNotFoundError:
                 print("file not found to remove")
         print("{} Successfully completed at {}".format(latest_date, datetime.now()))
+        sys.stdout.flush()
+        sys.stderr.flush()
 
 #setup paralell processing:
 if __name__=='__main__':
