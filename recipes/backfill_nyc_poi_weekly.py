@@ -14,7 +14,7 @@ import logging
 import sys
 
 is_prod = True
-n_cores = 3
+n_cores = 16
 
 #loop through the dates.
 def my_main(split_chunk):
