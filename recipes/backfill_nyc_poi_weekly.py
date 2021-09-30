@@ -27,9 +27,9 @@ def my_main(split_chunk):
         warnings.warn('for date: "{}"'.format(latest_date))
 
         query = '''
-        SELECT * FROM weekly_patterns_202107 
-        WHERE substr(date_range_start, 1, 10) = '{}'        
-        AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085')
+        SELECT * FROM weekly_patterns_202107
+        WHERE substr(date_range_start, 1, 10) = '{}'
+        AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085');
 
         '''.format(latest_date)
 
@@ -84,7 +84,7 @@ def my_main(split_chunk):
         sys.stdout.flush()
         sys.stderr.flush()
         if is_prod:
-            
+
             for index, row in df.iterrows():
                 iter = 0
                 pop_count = 0.0
@@ -115,7 +115,7 @@ def my_main(split_chunk):
 
 
                     except IndexError:
-                    
+
                         warning_message = 'warning: there is no row zero for key {}'.format(key)
                         #warnings.warn(warning_message)
                         #no_match_count isn't being used
@@ -136,7 +136,7 @@ def my_main(split_chunk):
                 synthetic_mult = sum_cbg_pop / no_zero_lambda_func(sum_cbg_devices * 1.0)
 
                 #if mutliplier is zero (for small visit counts without home block groups)
-               
+
                 sys.stdout.flush()
                 sys.stderr.flush()
                 #visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
@@ -146,17 +146,17 @@ def my_main(split_chunk):
                 #visits_pop_list.append(visits_pop_count)
                 multiplier_list.append(synthetic_mult)
                 #print("final pop count: {}".format(pop_count))
-            
-            
 
-            
+
+
+
             non_zero_multipliers =  [x for x in multiplier_list if x > 0]
             #print(f"non zero multipliers: {non_zero_multipliers}")
             #take the average of all the multipliers.
             avg_multiplier = np.mean(non_zero_multipliers)
             #fill multipliers with imputed multiplier.
             multiplier_list = [x if x > 0 else avg_multiplier for x in multiplier_list]
-    
+
             #convert device counts to population counts based on multiplier series.
             df['pop_multiplier'] = multiplier_list
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
@@ -164,7 +164,7 @@ def my_main(split_chunk):
             warnings.warn(df.head())
             warnings.warn(df.info())
             sys.stderr.flush()
-        
+
         warnings.warn(df.info())
         df.to_csv(Path(cwd) /f'poi_weekly_pop_added_{latest_date}.csv')
         s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
@@ -198,18 +198,18 @@ def my_main(split_chunk):
             except FileNotFoundError:
                 print("file not found to remove")
         print("{} Successfully completed at {}".format(latest_date, datetime.now()))
-        
+
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
-    
+
     start_time = time.perf_counter()
     print("start time is {}".format(datetime.now()))
     date_query ='''
       SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
       FROM hps_crawled22
       WHERE substr(date_range_start, 1, 10) > '2018-09-23'
-      ORDER BY date_range_start ASC;
+      ORDER BY date_range_start DESC;
      '''
     #can only upload as a a zip file or _helper.aws will break
     output_date_path = f"output/dev/parks/latest_date.csv.zip"
@@ -251,7 +251,7 @@ if __name__=='__main__':
     datetime_list = [x[:10] for x in dates_list]
     date_list_split = form_lists(n_cores, dates_list)
     print(date_list_split)
-    
+
     pool = Pool(n_cores)
     return_series = pd.concat(pool.map(my_main, date_list_split))
     pool.close()
