@@ -7,7 +7,7 @@ import json
 import warnings
 from datetime import datetime
 import time
-
+import numpy as np
 is_prod = True
 start_time = time.perf_counter()
 print("start time is {}".format(datetime.now()))
@@ -97,11 +97,13 @@ df = pd.read_csv(Path(cwd) / "nyc_weekly_patterns_latest.csv.zip" )
 if ((len(df) == 0) or (len(df_mult) == 0)) :
     raise("Either the home panel summary or the weekly patterns were not found")
     
-visitors_pop_list = []
-visits_pop_list = []
+#visitors_pop_list = []
+#visits_pop_list = []
 multiplier_list = []
 if is_prod:
-    for index, row in df.iterrows():
+    #don't want to modify the dataframe you are iterating over.
+    df_copy = df.copy()
+    for index, row in df_copy.iterrows():
         #read the visitor home cbgs and parse json
         #print(row['visitor_home_cbgs'])
         iter = 0
@@ -126,9 +128,16 @@ if is_prod:
                 if len(selected_rows_mult_df[selected_rows_mult_df['cbg'] == key]) > 1:
                     warning_message = "more than one match for key {}".format(key)
                     warnings.warn(warning_message)
-                multiplier = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('pop_multiplier')]
-                cbg_pop = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('cbg_pop')]
-                devices_residing = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('devices_residing')]
+                    
+                    #get census block group population
+                    cbg_pop = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('cbg_pop')]
+                    # need to multiplie by the number of visitors to get a weighted average
+                    cbg_pop = cbg_pop * value
+                    
+                    #get census block group device count
+                    devices_residing = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('devices_residing')]
+                    #and multiply here
+                    devices_residing = devices_residing * value
 
 
 
@@ -141,7 +150,6 @@ if is_prod:
                 multiplier = 0
                 cbg_pop = 0
                 devices_residing = 0
-            pop_calc = pop_count + multiplier * value * 1.0
             sum_cbg_pop = sum_cbg_pop + cbg_pop
             sum_cbg_devices = sum_cbg_devices + devices_residing
         #to fill in the missing values (i.e. Canada) take the average population of the other cbgs
@@ -151,18 +159,23 @@ if is_prod:
         visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
         visits_pop_count = row['raw_visit_counts'] * synthetic_mult
         #add value to list
-        visitors_pop_list.append(visitors_pop_count)
-        visits_pop_list.append(visits_pop_count)
+        #visitors_pop_list.append(visitors_pop_count)
+        #visits_pop_list.append(visits_pop_count)
         multiplier_list.append(synthetic_mult)
         #print("final pop count: {}".format(pop_count))
-
-    df['visits_pop_calc'] = visits_pop_list
-    df['visitors_pop_calc'] = visitors_pop_list
+#convert device counts to population counts based on multiplier series.
     df['pop_multiplier'] = multiplier_list
-
+    df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
+    df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
+    df['visits_by_day_pop_calc'] = ''
+    #overwriting previous df_copy
+    df_copy = df.copy()
+    for index, row in df_copy.iterrows():
+        df.at[index, 'visits_by_day_pop_calc' ] = list(np.multiply(row['visits_by_day'], np.repeat(multiplier_list[index], len(row['visits_by_day']))))
+    df_copy = None
     print(df.info())
     df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count_latest.csv")
     s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
 
     
@@ -183,7 +196,10 @@ print(df_parks.head(5))
 
 print('saving parks slice csv')
 df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
-s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
+if is_prod:
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_latest.csv")
+
 
 
 if is_prod: #uncomment in production
@@ -191,6 +207,10 @@ if is_prod: #uncomment in production
     os.remove(Path(cwd) / 'census_tmp.csv')
     os.remove(Path(cwd) / 'multiplier_temp.csv')
     os.remove(Path(cwd) / 'poi_weekly_pop_added.csv')
+    os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
+    os.remove(Path(cwd) / f'nyc_weekly_patterns_{latest_date}.csv.zip')
+    #os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
+    #os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
 
 print("Successfully completed at {}".format(datetime.now()))
 end_time = time.perf_counter()

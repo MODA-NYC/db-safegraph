@@ -104,13 +104,18 @@ def my_main(split_chunk):
                     selected_rows_mult_df = df_mult[selected_rows]
                     #isolate multiplier
                     try:
-                        #take the first row. should only be one match. Need to get this check working.
+                        #take the first row. should only be one match. 
                         if len(selected_rows_mult_df[selected_rows_mult_df['cbg'] == key]) > 1:
                             warning_message = "more than one match for key {}".format(key)
                             warnings.warn(warning_message)
-                        multiplier = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('pop_multiplier')]
+                        #multiplier = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('pop_multiplier')]
                         cbg_pop = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('cbg_pop')]
+                        # need to multiply by the number of visitors to get a weighted average
+                        cbg_pop = cbg_pop * value
+
                         devices_residing = selected_rows_mult_df.iloc[0, selected_rows_mult_df.columns.get_loc('devices_residing')]
+                        #and here
+                        devices_residing = devices_residing * value
 
 
 
@@ -122,7 +127,7 @@ def my_main(split_chunk):
                         no_match_count = no_match_count + value
                         no_match_count_rows = no_match_count_rows + 1
                         #if no multiplier, pop_count stays the same. Added back after the loop.
-                        multiplier = 0
+                        #multiplier = 0
                         cbg_pop = 0
                         devices_residing = 0
                     #this is done below. see synthtetic mult.
@@ -161,8 +166,16 @@ def my_main(split_chunk):
             df['pop_multiplier'] = multiplier_list
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
             df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
+            #it is a bit more complex to multiply a list
+            df['visits_by_day_pop_calc'] = ''
+            df_copy = df.copy()
+            for index, row in df_copy.iterrows():
+                df.at[index, 'visits_by_day_pop_calc' ] = list(np.multiply(row['visits_by_day'], np.repeat(multiplier_list[index], len(row['visits_by_day']))))
+            #garbage collection
+            df_copy = None
+            #df['visits_by_day_pop_calc'] = multiplier_list * df['visits_by_day']
             warnings.warn(str(df.head(5)))
-            print(df.info())
+            sys.stdout.flush()
             sys.stderr.flush()
 
         print(df.info())
@@ -210,7 +223,7 @@ if __name__=='__main__':
     date_query ='''
       SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
       FROM hps_crawled22
-      WHERE substr(date_range_start, 1, 10) > '2018-09-23'
+      WHERE substr(date_range_start, 1, 10) 
       ORDER BY date_range_start DESC;
      '''
     #can only upload as a a zip file or _helper.aws will break
