@@ -50,12 +50,13 @@ def my_main(split_chunk):
         query = '''
         SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
         FROM hps_crawled22 AS hps
+        INNER JOIN census on hps.census_block_group = census.census_block_group
+        WHERE substr(hps.date_range_start, 1, 10) = '{}'
         UNION
-        SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
+        SELECT (substr(hps2.date_range_start, 1, 10)) as date_range_start, hps2.census_block_group as cbg, hps2.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps2.number_devices_residing + 1.0) as pop_multiplier
         FROM hps_crawledhome_panel_summary_202107 AS hps2
         INNER JOIN census on hps2.census_block_group = census.census_block_group
-        WHERE substr(hps.date_range_start, 1, 10) = '{}'
-
+        WHERE substr(hps2.date_range_start, 1, 10) = '{}';
         '''.format(latest_date)
         #we want to include the entire census for multipliers (out of state visitors)
         #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
