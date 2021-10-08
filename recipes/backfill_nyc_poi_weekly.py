@@ -232,7 +232,6 @@ if __name__=='__main__':
     date_query ='''
       SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
       FROM hps_crawled22
-      WHERE substr(date_range_start, 1, 10) 
       ORDER BY date_range_start DESC;
      '''
     #can only upload as a a zip file or _helper.aws will break
