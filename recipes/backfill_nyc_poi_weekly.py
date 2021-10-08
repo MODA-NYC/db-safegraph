@@ -12,6 +12,7 @@ from multiprocessing import log_to_stderr
 from multiprocessing import Pool
 import logging
 import sys
+from ast import literal_eval
 
 is_prod = True
 n_cores = 16
