@@ -50,6 +50,9 @@ def my_main(split_chunk):
         query = '''
         SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
         FROM hps_crawled22 AS hps
+        UNION
+        SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
+        FROM hps_crawledhome_panel_summary_202107 AS hps
         INNER JOIN census on hps.census_block_group = census.census_block_group
         WHERE substr(hps.date_range_start, 1, 10) = '{}'
 
