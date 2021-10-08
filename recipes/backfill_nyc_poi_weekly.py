@@ -231,6 +231,9 @@ if __name__=='__main__':
     print("start time is {}".format(datetime.now()))
     date_query ='''
       SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
+      FROM hps_crawledhome_panel_summary_202107
+      UNION
+      SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
       FROM hps_crawled22
       ORDER BY date_range_start DESC;
      '''
