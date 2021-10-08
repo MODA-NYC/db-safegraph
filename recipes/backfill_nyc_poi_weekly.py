@@ -14,7 +14,7 @@ import logging
 import sys
 
 is_prod = True
-n_cores = 16
+n_cores = 1
 
 #loop through the dates.
 def my_main(split_chunk):
@@ -223,7 +223,6 @@ if __name__=='__main__':
     date_query ='''
       SELECT DISTINCT(substr(date_range_start, 1, 10)) as date_range_start
       FROM hps_crawled22
-      WHERE substr(date_range_start, 1, 10) 
       ORDER BY date_range_start DESC;
      '''
     #can only upload as a a zip file or _helper.aws will break
