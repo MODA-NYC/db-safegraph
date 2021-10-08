@@ -167,10 +167,18 @@ def my_main(split_chunk):
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
             df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
             #it is a bit more complex to multiply a list
-            df['visits_by_day_pop_calc'] = ''
+            df['visits_by_day_pop_calc'] = None
+            df['visits_by_hour_pop_calc'] = None
             df_copy = df.copy()
+
+            def multiply_list(by_day_list, multiplier_list):
+                visits_by_day = [float(x) * 1.0 for x in literal_eval(by_day_list)]
+                this_multiplier = multiplier_list[index]
+                return list(np.multiply(visits_by_day, (np.repeat(this_multiplier * 1.0, len(visits_by_day)))))
+                
             for index, row in df_copy.iterrows():
-                df.at[index, 'visits_by_day_pop_calc' ] = list(np.multiply(row['visits_by_day'], np.repeat(multiplier_list[index], len(row['visits_by_day']))))
+                df.at[index, 'visits_by_day_pop_calc' ] = multiply_list(row['visits_by_day'], multiplier_list)
+                df.at[index, 'visits_by_hour_pop_calc'] = multiply_list(row['visits_by_each_hour'], multiplier_list)
             #garbage collection
             df_copy = None
             #df['visits_by_day_pop_calc'] = multiplier_list * df['visits_by_day']

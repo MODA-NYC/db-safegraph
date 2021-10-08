@@ -170,8 +170,15 @@ if is_prod:
     df['visits_by_day_pop_calc'] = ''
     #overwriting previous df_copy
     df_copy = df.copy()
+    def multiply_list(by_day_list, multiplier_list):
+        visits_by_day = [float(x) * 1.0 for x in literal_eval(by_day_list)]
+        this_multiplier = multiplier_list[index]
+        return list(np.multiply(visits_by_day, (np.repeat(this_multiplier * 1.0, len(visits_by_day)))))
+
     for index, row in df_copy.iterrows():
-        df.at[index, 'visits_by_day_pop_calc' ] = list(np.multiply(row['visits_by_day'], np.repeat(multiplier_list[index], len(row['visits_by_day']))))
+        df.at[index, 'visits_by_day_pop_calc' ] = multiply_list(row['visits_by_day'], multiplier_list)
+        df.at[index, 'visits_by_hour_pop_calc'] = multiply_list(row['visits_by_each_hour'], multiplier_list)
+    #garbage collection    
     df_copy = None
     print(df.info())
     df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
