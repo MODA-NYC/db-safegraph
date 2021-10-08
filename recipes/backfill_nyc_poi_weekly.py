@@ -57,7 +57,7 @@ def my_main(split_chunk):
         FROM hps_crawledhome_panel_summary_202107 AS hps2
         INNER JOIN census on hps2.census_block_group = census.census_block_group
         WHERE substr(hps2.date_range_start, 1, 10) = '{}';
-        '''.format(latest_date)
+        '''.format(latest_date, latest_date)
         #we want to include the entire census for multipliers (out of state visitors)
         #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
