@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types: [weekly]
- schedule:
+  schedule:
     - cron: 0 23 * * 5
 
 jobs: 
-  Weekly:
+  Pop_Calc:
     runs-on: ubuntu-latest
     env:
       RDP_S3_ENDPOINT: https://s3.amazonaws.com 
