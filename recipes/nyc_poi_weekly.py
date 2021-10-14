@@ -11,6 +11,7 @@ import numpy as np
 from ast import literal_eval
 is_prod = True
 start_time = time.perf_counter()
+
 print("start time is {}".format(datetime.now()))
 date_query ='''
   SELECT MAX(date_range_start) as max_date
@@ -68,9 +69,13 @@ if is_prod:
     s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_latest.csv.zip', str(Path(cwd) / 'nyc_weekly_patterns_latest.csv.zip'))
 
 ##### get multiplier #####
-
+#isntead of adding 1 to all devices, how about checking for 0.
 query = '''
-SELECT hps.date_range_start as my_date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (hps.number_devices_residing + 1.0) as pop_multiplier
+SELECT hps.date_range_start as my_date_range_start,
+    hps.census_block_group as cbg,
+    hps.number_devices_residing as devices_residing, 
+    census.b01001e1 as cbg_pop, 
+    census.b01001e1 / (CASE WHEN(hps.number_devices_residing = 0) THEN 1 ELSE hps.number_devices_residing END) as pop_multiplier 
 FROM home_panel_summary_202107 AS hps
 INNER JOIN census on hps.census_block_group = census.census_block_group
 WHERE substr(hps.date_range_start, 1, 10) = '{}'
