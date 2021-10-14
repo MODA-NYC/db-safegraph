@@ -1,4 +1,4 @@
-name: Test_POI_pop
+name: POI_Pop_Weekly
 
 on:
   workflow_dispatch:
