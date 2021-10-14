@@ -48,7 +48,7 @@ WHERE substr(date_range_start, 1, 10) = '{}'
 AND substr(poi_cbg, 1, 5) in ('36005', '36047', '36061', '36081', '36085');
 '''.format(latest_date)
 
-output_csv_path = "output/dev/parks/nyc_weekly_patterns_latest.csv.zip"
+output_csv_path = "output/dev/parks/nyc-weekly-patterns/nyc_weekly_patterns_latest.csv.zip"
 #make sure to uncomment this in production
 if is_prod:
     aws.execute_query(
@@ -57,7 +57,7 @@ if is_prod:
         output=output_csv_path
     )
 
-output_csv_path_2 = "output/dev/parks/nyc_weekly_patterns_{}.csv.zip".format(latest_date)
+output_csv_path_2 = "output/dev/parks/nyc-weekly-patterns/nyc_weekly_patterns_{}.csv.zip".format(latest_date)
 if is_prod:
     aws.execute_query(
         query=query,
@@ -66,7 +66,7 @@ if is_prod:
     )
 
 
-    s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_latest.csv.zip', str(Path(cwd) / 'nyc_weekly_patterns_latest.csv.zip'))
+    s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc-weekly-patterns/nyc_weekly_patterns_latest.csv.zip', str(Path(cwd) / 'nyc_weekly_patterns_latest.csv.zip'))
 
 ##### get multiplier #####
 #isntead of adding 1 to all devices, how about checking for 0.
@@ -83,7 +83,7 @@ WHERE substr(hps.date_range_start, 1, 10) = '{}'
 #we want to include the entire census for multipliers (out of state visitors)
 #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
-output_csv_path = f"output/dev/parks/pop_to_device_multiplier.csv.zip"
+output_csv_path = f"output/dev/parks/safegraph-with-population/pop_to_device_multiplier.csv.zip"
 #uncomment in production
 if is_prod:
     aws.execute_query(
@@ -93,7 +93,7 @@ if is_prod:
     )
 
 
-s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/pop_to_device_multiplier.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
+s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/safegraph-with-population/pop_to_device_multiplier.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
 
 df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': object})
 
@@ -188,8 +188,8 @@ if is_prod:
     df_copy = None
     print(df.info())
     df.to_csv(Path(cwd) /'poi_weekly_pop_added.csv')
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/poi_with_population_count_latest.csv")
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / 'poi_weekly_pop_added.csv'), "output/dev/parks/safegraph-with-population/poi_with_population_count_latest.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added.csv'), f"output/dev/parks/safegraph-with-population/poi_with_population_count_{latest_date}.csv")
 
     
 df_ans = pd.read_csv('poi_weekly_pop_added.csv')
@@ -210,8 +210,8 @@ print(df_parks.head(5))
 print('saving parks slice csv')
 df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
 if is_prod:
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
-    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_latest.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks-slice-poi/parks_slice_poi_{latest_date}.csv")
+    s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks-slice-poi/parks_slice_poi_latest.csv")
 
 
 
