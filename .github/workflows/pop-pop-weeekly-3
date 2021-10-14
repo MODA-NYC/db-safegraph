@@ -1,12 +1,19 @@
 
 name:  Pop Weekly Three
 
-on:  
+on: 
   workflow_dispatch:
   schedule:
     - cron: 0 23 * * 5
-  repository_dispatch:
-    types: [weekly]
+    repository_dispatch:
+      types: [weekly]
+
+#on:  
+#  workflow_dispatch:
+#  schedule:
+#    - cron: 0 23 * * 5
+#  repository_dispatch:
+#    types: [weekly]
 
 jobs:
   Weekly:
