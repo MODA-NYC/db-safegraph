@@ -3,7 +3,7 @@ name: POI_Pop_Weekly
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [weekly]
+    types: [pop_calc]
   schedule:
     - cron: 0 23 * * 5
 
