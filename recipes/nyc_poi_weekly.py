@@ -129,6 +129,8 @@ if is_prod:
             #filter df_mult
             selected_rows_mult_df = df_mult[selected_rows]
             #isolate multiplier
+            cbg_pop = 0
+            devices_residing = 0
             try:
                 #take the first row. should only be one match. Need to get this check working.
                 if len(selected_rows_mult_df[selected_rows_mult_df['cbg'] == key]) > 1:
