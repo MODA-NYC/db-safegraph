@@ -34,7 +34,7 @@ def my_main(split_chunk):
 
         '''.format(latest_date)
 
-        output_csv_path_2 = 'output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date)
+        output_csv_path_2 = 'output/dev/parks/nyc-weekly-patterns/nyc_weekly_patterns_{}.csv.zip'.format(latest_date)
         if is_prod:
             aws.execute_query(
                 query=query,
@@ -43,17 +43,17 @@ def my_main(split_chunk):
             )
 
 
-            s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip'))
+            s3.Bucket('recovery-data-partnership').download_file('output/dev/parks/nyc-weekly-patterns/nyc_weekly_patterns_{}.csv.zip'.format(latest_date), str(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip'))
 
         ##### get multiplier #####
-
+        
         query = '''
         SELECT (substr(hps.date_range_start, 1, 10)) as date_range_start, hps.census_block_group as cbg, hps.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (CASE WHEN(hps.number_devices_residing = 0) THEN 1 ELSE hps.number_devices_residing END)as pop_multiplier
         FROM hps_crawled22 AS hps
         INNER JOIN census on hps.census_block_group = census.census_block_group
         WHERE substr(hps.date_range_start, 1, 10) = '{}'
         UNION
-        SELECT (substr(hps2.date_range_start, 1, 10)) as date_range_start, hps2.census_block_group as cbg, hps2.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (CASE WHEN(hps.number_devices_residing = 0) THEN 1 ELSE hps.number_devices_residing END) as pop_multiplier
+        SELECT (substr(hps2.date_range_start, 1, 10)) as date_range_start, hps2.census_block_group as cbg, hps2.number_devices_residing as devices_residing, census.b01001e1 as cbg_pop, census.b01001e1 / (CASE WHEN(hps2.number_devices_residing = 0) THEN 1 ELSE hps2.number_devices_residing END) as pop_multiplier
         FROM hps_crawledhome_panel_summary_202107 AS hps2
         INNER JOIN census on hps2.census_block_group = census.census_block_group
         WHERE substr(hps2.date_range_start, 1, 10) = '{}';
@@ -61,8 +61,7 @@ def my_main(split_chunk):
         #we want to include the entire census for multipliers (out of state visitors)
         #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
-        output_csv_path = f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip'
-        #uncomment in production
+        output_csv_path = f'output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier_{latest_date}.csv.zip'
         if is_prod:
             aws.execute_query(
                 query=query,
@@ -70,8 +69,7 @@ def my_main(split_chunk):
                 output=output_csv_path
             )
 
-
-        s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
+        s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
 
         df_mult = pd.read_csv(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
         #print(df_mult.info())
@@ -193,7 +191,7 @@ def my_main(split_chunk):
 
         print(df.info())
         df.to_csv(Path(cwd) /f'poi_weekly_pop_added_{latest_date}.csv')
-        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/poi_with_population_count_{latest_date}.csv")
+        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv'), f"output/dev/parks/safegraph-with-population/poi_with_population_count_{latest_date}.csv")
         sys.stdout.flush()
         sys.stderr.flush()
         df_ans = pd.read_csv(f'poi_weekly_pop_added_{latest_date}.csv')
@@ -212,7 +210,7 @@ def my_main(split_chunk):
 
         print('saving parks slice csv')
         df_parks.to_csv(f'parks_slice_poi_{latest_date}.csv')
-        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks_slice_poi_{latest_date}.csv")
+        s3.Bucket('recovery-data-partnership').upload_file(str(Path(cwd) / f'parks_slice_poi_{latest_date}.csv'), f"output/dev/parks/parks-slice-poi/parks_slice_poi_{latest_date}.csv")
 
 
         if is_prod: #uncomment in production

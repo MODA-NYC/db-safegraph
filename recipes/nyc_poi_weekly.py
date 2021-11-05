@@ -85,7 +85,7 @@ WHERE substr(hps.date_range_start, 1, 10) = '{}'
 #we want to include the entire census for multipliers (out of state visitors)
 #AND substr(hps.census_block_group, 1, 5) IN ('36005', '36047', '36061', '36081', '36085')
 
-output_csv_path = f"output/dev/parks/safegraph-with-population/pop_to_device_multiplier.csv.zip"
+output_csv_path = f"output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier-{latest_date}.csv.zip"
 #uncomment in production
 if is_prod:
     aws.execute_query(
@@ -95,7 +95,7 @@ if is_prod:
     )
 
 
-s3.Bucket('recovery-data-partnership').download_file("output/dev/parks/safegraph-with-population/pop_to_device_multiplier.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
+s3.Bucket('recovery-data-partnership').download_file(f"output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier-{latest_date}.csv.zip", str(Path(cwd) / 'multiplier_temp.csv.zip'))
 
 df_mult = pd.read_csv(Path(cwd) / 'multiplier_temp.csv.zip', dtype={'cbg': object})
 
@@ -202,7 +202,7 @@ df_ans = pd.read_csv('poi_weekly_pop_added.csv')
 #print(df_ans.head(20))
 
 #Extract parks data
-parks_poi_df = pd.read_csv('nyc_parks_pois_keys_082021.csv')
+parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
 df_ans['placekey'] = df_ans['placekey'].astype(str)
 parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
