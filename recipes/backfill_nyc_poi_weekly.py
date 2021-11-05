@@ -15,7 +15,7 @@ import sys
 from ast import literal_eval
 
 is_prod = True
-n_cores = 16
+n_cores = 2
 
 #loop through the dates.
 def my_main(split_chunk):
@@ -268,6 +268,9 @@ if __name__=='__main__':
     #date_list_split = np.array_split(dates_df, n_cores)
     #split list in such a way that they are all working on the same dates and increase lowest to high.
     dates_list = dates_df['date_range_start']
+    #filter dates
+    cutoff_date = "2021-09-27"
+    dates_list = [x for x in dates_list if x > cutoff_date]
     def form_lists(n_cores, list):
         i = 0
         c = 0
