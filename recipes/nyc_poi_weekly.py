@@ -1,4 +1,6 @@
 import os
+
+from pandas.core.base import NoNewAttributesMixin
 from _helper import aws
 import pandas as pd
 import boto3
@@ -175,7 +177,8 @@ if is_prod:
     df['pop_multiplier'] = multiplier_list
     df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
     df['visitors_pop_calc'] = multiplier_list * df['raw_visitor_counts']
-    df['visits_by_day_pop_calc'] = ''
+    df['visits_by_day_pop_calc'] = None
+    df['visits_by_hour_pop_calc'] = None
     #overwriting previous df_copy
     df_copy = df.copy()
     def multiply_list(by_day_list, multiplier_list):
