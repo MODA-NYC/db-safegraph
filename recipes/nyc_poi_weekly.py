@@ -202,7 +202,7 @@ df_ans = pd.read_csv('poi_weekly_pop_added.csv')
 #print(df_ans.head(20))
 
 #Extract parks data
-parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
+parks_poi_df = pd.read_csv(Path(cwd) / 'recipes'/ 'nyc_parks_pois_keys_082021.csv')
 df_ans['placekey'] = df_ans['placekey'].astype(str)
 parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
