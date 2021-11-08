@@ -222,7 +222,6 @@ if is_prod:
 
 if is_prod: #uncomment in production
     os.remove(Path(cwd) / 'nyc_weekly_patterns_latest.csv.zip')
-    os.remove(Path(cwd) / 'census_tmp.csv')
     os.remove(Path(cwd) / 'multiplier_temp.csv')
     os.remove(Path(cwd) / 'poi_weekly_pop_added.csv')
     os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
