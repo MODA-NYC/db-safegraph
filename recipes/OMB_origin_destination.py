@@ -9,7 +9,7 @@ from pathlib import Path
 
 query = '''
 SELECT * FROM neighborhood_patterns_202107 
-WHERE date_range_start = (SELECT MAX(date_range_start)
+WHERE substr(date_range_start, 1, 10) = (SELECT MAX(substr(date_range_start, 1, 10))
                           FROM neighborhood_patterns_202107 as np2
                           );
 '''
@@ -30,7 +30,7 @@ s3.Bucket('recovery-data-partnership').download_file('output/dev/ops/neighborhoo
 
 ###### taken from query folder #####
 df = pd.read_csv(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")
-print(df.info())
+#print(df.info())
 os.remove(Path(cwd) / "neighborhood_patterns_US_latest.csv.zip")
 import os
 from pathlib import Path

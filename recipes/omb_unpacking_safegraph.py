@@ -12,7 +12,7 @@ cwd = Path(os.getcwd())
 
 query = '''
 SELECT * FROM neighborhood_patterns_202107 
-WHERE date_range_start = (SELECT MAX(date_range_start)
+WHERE substr(date_range_start, 1, 10) = (SELECT MAX(substr(date_range_start, 1, 10))
                           FROM neighborhood_patterns_202107 as np2
                           );
 '''
