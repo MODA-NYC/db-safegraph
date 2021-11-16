@@ -1,0 +1,28 @@
+name: OMB Manual Run
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [weekly]
+
+
+jobs: 
+  Weekly:
+    runs-on: ubuntu-latest
+    env:
+      RDP_S3_ENDPOINT: https://s3.amazonaws.com 
+      RDP_ACCESS_KEY_ID: ${{ secrets.RDP_ACCESS_KEY_ID }}
+      RDP_SECRET_ACCESS_KEY: ${{ secrets.RDP_SECRET_ACCESS_KEY }}
+      AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies ...
+        run: pip3 install -r requirements.txt
+
+      - name: Run OMB origin/destination query ...
+        run: ./sg run --name OMB_origin_destination
+        
+      #- name: Run OMB query and unpack hours to 1500 columns ...
+      #  run: ./sg run --name omb_unpacking_safegraph

@@ -96,6 +96,7 @@ for index, row in df.iterrows():
                    'month':row['m']}
         answer_df = answer_df.append(new_row, ignore_index=True)     
 ### save answer locally
+print(answer_df.head(10))
 answer_df.to_csv(Path(cwd) / 'OMB_query_temp.csv')
 
 #upload CSV to AWS S3
