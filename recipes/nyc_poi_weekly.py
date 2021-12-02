@@ -286,10 +286,11 @@ if __name__=='__main__':
     print(date_list_split)
 
     pool = Pool(n_cores)
-    return_series = pd.concat(pool.map(my_main, date_list_split))
+    pool.map(my_main, date_list_split)
+    #return_series = pd.concat(pool.map(my_main, date_list_split))
     pool.close()
-    pool.join()
-    print(f"return series: {return_series}")
+    #pool.join()
+    #print(f"return series: {return_series}")
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
     time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
