@@ -31,9 +31,10 @@ jobs:
       # This takes too long and fails.
       #- name: Run OMB origin/destination query ...
       #  run: ./sg run --name OMB_origin_destination
-        
-      - name: Run OMB query and unpack hours to 1500 columns ...
-        run: ./sg run --name omb_unpacking_safegraph
+      
+      # Also taking too long
+      #- name: Run OMB query and unpack hours to 1500 columns ...
+      #  run: ./sg run --name omb_unpacking_safegraph
 
       - name: Run NYC points of interests (for everyone but under parks) ...
         run: ./sg run --name nyc_poi_weekly
