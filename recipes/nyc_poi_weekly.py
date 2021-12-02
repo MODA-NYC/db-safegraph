@@ -268,9 +268,12 @@ if __name__=='__main__':
     #date_list_split = np.array_split(dates_df, n_cores)
     #split list in such a way that they are all working on the same dates and increase lowest to high.
     dates_list = dates_df['date_range_start']
+    #print(f"original dates list {dates_list}")
     #filter dates
     cutoff_date = "2021-09-27"
-    dates_list = [max(x) for x in dates_list if x > cutoff_date]
+    dates_list = [x for x in dates_list if x > cutoff_date]
+    dates_list.sort(reverse=True)
+    dates_list = [dates_list[0]]
     def form_lists(n_cores, list):
         i = 0
         c = 0
@@ -281,10 +284,10 @@ if __name__=='__main__':
             c = c + 1
             i = i + 1
         return [np.array(x) for x in ans]
-    datetime_list = [x[:10] for x in dates_list]
-    date_list_split = form_lists(n_cores, dates_list)
-    print(date_list_split)
+    #datetime_list = [x[:10] for x in dates_list]
 
+    #date_list_split = form_lists(n_cores, dates_list)
+    date_list_split = np.array(dates_list)
     pool = Pool(n_cores)
     pool.map(my_main, date_list_split)
     #return_series = pd.concat(pool.map(my_main, date_list_split))
