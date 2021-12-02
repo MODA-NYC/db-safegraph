@@ -287,11 +287,13 @@ if __name__=='__main__':
     #datetime_list = [x[:10] for x in dates_list]
 
     #date_list_split = form_lists(n_cores, dates_list)
-    date_list_split = np.array(dates_list)
-    pool = Pool(n_cores)
-    pool.map(my_main, date_list_split)
+    #date_list_split = np.array(dates_list)
+    #pool = Pool(n_cores)
+    #pool.map(my_main, date_list_split)
+    #pool.map(my_main, dates_list )
     #return_series = pd.concat(pool.map(my_main, date_list_split))
-    pool.close()
+    #pool.close()
+    my_main(dates_list)
     #pool.join()
     #print(f"return series: {return_series}")
     end_time = time.perf_counter()
