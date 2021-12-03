@@ -14,6 +14,7 @@ import logging
 import sys
 from ast import literal_eval
 
+#need to execute this script on a local machine from the recipes directory as current working directory.
 is_prod = True
 n_cores = 2
 #You need to be located inside the recipes folder
