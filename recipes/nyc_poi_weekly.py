@@ -208,7 +208,7 @@ def my_main(split_chunk):
 
         if is_prod: #uncomment in production
             try:
-                os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
+                os.remove(Path(cwd) / f'parks_slice_poi_{latest_date}.csv')
                 os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
