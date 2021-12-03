@@ -199,7 +199,7 @@ def my_main(split_chunk):
         #print(df_ans.head(20))
 
         #Extract parks data
-        parks_poi_df = pd.read_csv('nyc_parks_pois_keys_082021.csv')
+        parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
         df_ans['placekey'] = df_ans['placekey'].astype(str)
         parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
@@ -230,7 +230,9 @@ def my_main(split_chunk):
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
-
+    parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
+    print(parks_poi_df.info())
+    raise Exception("stop here")
     start_time = time.perf_counter()
     print("start time is {}".format(datetime.now()))
     date_query ='''
