@@ -16,7 +16,7 @@ from ast import literal_eval
 
 is_prod = True
 n_cores = 2
-
+#You need to be located inside the recipes folder
 #loop through the dates.
 def my_main(split_chunk):
     s3 = boto3.resource('s3')
@@ -215,12 +215,14 @@ def my_main(split_chunk):
 
         if is_prod: #uncomment in production
             try:
-                os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
+                os.remove(Path(cwd) / f'parks_slice_poi_{latest_date}.csv')
                 os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
             except FileNotFoundError:
                 print("file not found to remove")
+            except PermissionError:
+                print("couldn't remove because file is in use.")
         print("{} Successfully completed at {}".format(latest_date, datetime.now()))
         sys.stdout.flush()
         sys.stderr.flush()
@@ -267,7 +269,8 @@ if __name__=='__main__':
     #split list in such a way that they are all working on the same dates and increase lowest to high.
     dates_list = dates_df['date_range_start']
     #filter dates
-    cutoff_date = "2021-09-27"
+    #cutoff_date = "2021-09-27"
+    cutoff_date = "2021-10-19"
     dates_list = [x for x in dates_list if x > cutoff_date]
     def form_lists(n_cores, list):
         i = 0
