@@ -230,6 +230,7 @@ def my_main(split_chunk):
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
+    cwd = os.getcwd()
     parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
     print(parks_poi_df.info())
     raise Exception("stop here")
