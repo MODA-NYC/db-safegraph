@@ -22,11 +22,9 @@ def my_main(split_chunk):
     s3 = boto3.resource('s3')
     cwd = os.getcwd()
     s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
-    #print(f"split chunk of rows: {split_chunk_of_rows.info()}")
     for my_date in split_chunk:
         latest_date = my_date
-        warnings.warn('for date: "{}"'.format(latest_date))
-
+        print('for date: "{}"'.format(latest_date))
         query = '''
         SELECT * FROM weekly_patterns_202107
         WHERE substr(date_range_start, 1, 10) = '{}'
@@ -147,11 +145,6 @@ def my_main(split_chunk):
 
                 sys.stdout.flush()
                 sys.stderr.flush()
-                #visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
-                #visits_pop_count = row['raw_visit_counts'] * synthetic_mult
-                #add value to list
-                #visitors_pop_list.append(visitors_pop_count)
-                #visits_pop_list.append(visits_pop_count)
                 multiplier_list.append(synthetic_mult)
                 #print("final pop count: {}".format(pop_count))
 
@@ -263,22 +256,14 @@ if __name__=='__main__':
     dates_df = pd.read_csv(Path(cwd) / "latest_date.csv.zip")
 
 
+
     #removed the pool code
     dates_list = dates_df['date_range_start']
     cutoff_date = "2021-09-27"
     dates_list = [x for x in dates_list if x > cutoff_date]
+    #get the latest date
     dates_list.sort(reverse=True)
     dates_list = [dates_list[0]]
-    def form_lists(n_cores, list):
-        i = 0
-        c = 0
-        ans = [ [] for n in range(n_cores)]
-
-        while i < len(list):
-            ans[ c % n_cores].append(list[i])
-            c = c + 1
-            i = i + 1
-        return [np.array(x) for x in ans]
     my_main(dates_list)
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
