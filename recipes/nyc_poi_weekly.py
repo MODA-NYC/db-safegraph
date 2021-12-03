@@ -199,7 +199,7 @@ def my_main(split_chunk):
         #print(df_ans.head(20))
 
         #Extract parks data
-        parks_poi_df = pd.read_csv(Path(cwd) / 'nyc_parks_pois_keys_082021.csv')
+        parks_poi_df = pd.read_csv(Path(cwd) / 'recipes' / 'nyc_parks_pois_keys_082021.csv')
         df_ans['placekey'] = df_ans['placekey'].astype(str)
         parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
@@ -230,10 +230,6 @@ def my_main(split_chunk):
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
-    cwd = os.getcwd()
-    parks_poi_df = pd.read_csv(Path(cwd) / 'recipes' / 'nyc_parks_pois_keys_082021.csv')
-    print(parks_poi_df.info())
-    raise Exception("stop here")
     start_time = time.perf_counter()
     print("start time is {}".format(datetime.now()))
     date_query ='''
@@ -267,12 +263,8 @@ if __name__=='__main__':
     dates_df = pd.read_csv(Path(cwd) / "latest_date.csv.zip")
 
 
-
-    #date_list_split = np.array_split(dates_df, n_cores)
-    #split list in such a way that they are all working on the same dates and increase lowest to high.
+    #removed the pool code
     dates_list = dates_df['date_range_start']
-    #print(f"original dates list {dates_list}")
-    #filter dates
     cutoff_date = "2021-09-27"
     dates_list = [x for x in dates_list if x > cutoff_date]
     dates_list.sort(reverse=True)
@@ -287,18 +279,7 @@ if __name__=='__main__':
             c = c + 1
             i = i + 1
         return [np.array(x) for x in ans]
-    #datetime_list = [x[:10] for x in dates_list]
-
-    #date_list_split = form_lists(n_cores, dates_list)
-    #date_list_split = np.array(dates_list)
-    #pool = Pool(n_cores)
-    #pool.map(my_main, date_list_split)
-    #pool.map(my_main, dates_list )
-    #return_series = pd.concat(pool.map(my_main, date_list_split))
-    #pool.close()
     my_main(dates_list)
-    #pool.join()
-    #print(f"return series: {return_series}")
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
     time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
