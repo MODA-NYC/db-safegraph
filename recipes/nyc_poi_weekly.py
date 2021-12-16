@@ -22,11 +22,9 @@ def my_main(split_chunk):
     s3 = boto3.resource('s3')
     cwd = os.getcwd()
     s3_obj = s3.Bucket('recovery-data-partnership').Object('output/dev/parks')
-    #print(f"split chunk of rows: {split_chunk_of_rows.info()}")
     for my_date in split_chunk:
         latest_date = my_date
-        warnings.warn('for date: "{}"'.format(latest_date))
-
+        print('for date: "{}"'.format(latest_date))
         query = '''
         SELECT * FROM weekly_patterns_202107
         WHERE substr(date_range_start, 1, 10) = '{}'
@@ -72,9 +70,16 @@ def my_main(split_chunk):
         s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
 
         df_mult = pd.read_csv(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
-        #print(df_mult.info())
-        #print(df_mult.head())
-        #works
+        print(df_mult.info())
+        is_in_nyc = [True if row[:5] in ['36005', '36047', '36061', '36081', '36085'] else False for row in df_mult['cbg']]
+        df_mult_nyc = df_mult[is_in_nyc]
+        df_mult_nyc.reset_index()
+
+        sum_pop = df_mult_nyc['cbg_pop'].sum()
+        sum_dc = df_mult_nyc['devices_residing'].sum()
+        macro_multiplier = sum_pop / (sum_dc * 1.0)
+        print(f"macro_multiplier: {macro_multiplier}")
+
 
         ##### join census to cbg to weekly patterns and multiply #####
         df = pd.read_csv(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip' )
@@ -147,23 +152,14 @@ def my_main(split_chunk):
 
                 sys.stdout.flush()
                 sys.stderr.flush()
-                #visitors_pop_count = row['raw_visitor_counts'] * synthetic_mult
-                #visits_pop_count = row['raw_visit_counts'] * synthetic_mult
-                #add value to list
-                #visitors_pop_list.append(visitors_pop_count)
-                #visits_pop_list.append(visits_pop_count)
                 multiplier_list.append(synthetic_mult)
                 #print("final pop count: {}".format(pop_count))
 
 
 
 
-            non_zero_multipliers =  [x for x in multiplier_list if x > 0]
-            #print(f"non zero multipliers: {non_zero_multipliers}")
-            #take the average of all the multipliers.
-            avg_multiplier = np.mean(non_zero_multipliers)
             #fill multipliers with imputed multiplier.
-            multiplier_list = [x if x > 0 else avg_multiplier for x in multiplier_list]
+            multiplier_list = [x if x > 0 else macro_multiplier for x in multiplier_list]
 
             #convert device counts to population counts based on multiplier series.
             df['pop_multiplier'] = multiplier_list
@@ -199,7 +195,7 @@ def my_main(split_chunk):
         #print(df_ans.head(20))
 
         #Extract parks data
-        parks_poi_df = pd.read_csv('nyc_parks_pois_keys_082021.csv')
+        parks_poi_df = pd.read_csv(Path(cwd) / 'recipes' / 'nyc_parks_pois_keys_082021.csv')
         df_ans['placekey'] = df_ans['placekey'].astype(str)
         parks_poi_df['placekey'] = parks_poi_df['placekey'].astype(str)
 
@@ -215,7 +211,7 @@ def my_main(split_chunk):
 
         if is_prod: #uncomment in production
             try:
-                os.remove(Path(cwd)) / f'parks_slice_poi_{latest_date}.csv'
+                os.remove(Path(cwd) / f'parks_slice_poi_{latest_date}.csv')
                 os.remove(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip')
                 os.remove(Path(cwd) / f'poi_weekly_pop_added_{latest_date}.csv')
@@ -230,7 +226,6 @@ def my_main(split_chunk):
 #setup paralell processing:
 if __name__=='__main__':
     log_to_stderr(logging.DEBUG)
-
     start_time = time.perf_counter()
     print("start time is {}".format(datetime.now()))
     date_query ='''
@@ -265,31 +260,14 @@ if __name__=='__main__':
 
 
 
-    #date_list_split = np.array_split(dates_df, n_cores)
-    #split list in such a way that they are all working on the same dates and increase lowest to high.
+    #removed the pool code
     dates_list = dates_df['date_range_start']
-    #filter dates
     cutoff_date = "2021-09-27"
-    dates_list = [max(x) for x in dates_list if x > cutoff_date]
-    def form_lists(n_cores, list):
-        i = 0
-        c = 0
-        ans = [ [] for n in range(n_cores)]
-
-        while i < len(list):
-            ans[ c % n_cores].append(list[i])
-            c = c + 1
-            i = i + 1
-        return [np.array(x) for x in ans]
-    datetime_list = [x[:10] for x in dates_list]
-    date_list_split = form_lists(n_cores, dates_list)
-    print(date_list_split)
-
-    pool = Pool(n_cores)
-    return_series = pd.concat(pool.map(my_main, date_list_split))
-    pool.close()
-    pool.join()
-    print(f"return series: {return_series}")
+    dates_list = [x for x in dates_list if x > cutoff_date]
+    #get the latest date
+    dates_list.sort(reverse=True)
+    dates_list = [dates_list[0]]
+    my_main(dates_list)
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
     time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
