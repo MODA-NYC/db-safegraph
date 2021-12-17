@@ -73,10 +73,14 @@ def my_main(split_chunk):
         s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
 
         df_mult = pd.read_csv(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
-        #print(df_mult.info())
-        #print(df_mult.head())
-        #works
+             is_in_nyc = [True if row[:5] in ['36005', '36047', '36061', '36081', '36085'] else False for row in df_mult['cbg']]
+        df_mult_nyc = df_mult[is_in_nyc]
+        df_mult_nyc.reset_index()
 
+        sum_pop = df_mult_nyc['cbg_pop'].sum()
+        sum_dc = df_mult_nyc['devices_residing'].sum()
+        macro_multiplier = sum_pop / (sum_dc * 1.0)
+        
         ##### join census to cbg to weekly patterns and multiply #####
         df = pd.read_csv(Path(cwd) / f'nyc_weekly_patterns_temp_{latest_date}.csv.zip' )
         # for each row in the dataframe
@@ -164,7 +168,8 @@ def my_main(split_chunk):
             #take the average of all the multipliers.
             avg_multiplier = np.mean(non_zero_multipliers)
             #fill multipliers with imputed multiplier.
-            multiplier_list = [x if x > 0 else avg_multiplier for x in multiplier_list]
+            multiplier_list = [x if x > 0 else macro_multiplier for x in multiplier_list]
+            print(f"avg_multiplier: {avg_multiplier}, macro_multiplier:{macro_multiplier}")
 
             #convert device counts to population counts based on multiplier series.
             df['pop_multiplier'] = multiplier_list

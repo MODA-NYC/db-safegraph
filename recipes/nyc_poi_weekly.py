@@ -79,6 +79,8 @@ def my_main(split_chunk):
         sum_dc = df_mult_nyc['devices_residing'].sum()
         macro_multiplier = sum_pop / (sum_dc * 1.0)
         print(f"macro_multiplier: {macro_multiplier}")
+        
+        
 
 
         ##### join census to cbg to weekly patterns and multiply #####
@@ -159,8 +161,14 @@ def my_main(split_chunk):
 
 
             #fill multipliers with imputed multiplier.
+            non_zero_multipliers =  [x for x in multiplier_list if x > 0]
+            #print(f"non zero multipliers: {non_zero_multipliers}")
+            #take the average of all the multipliers.
+            avg_multiplier = np.mean(non_zero_multipliers)
+            #fill multipliers with imputed multiplier.
+            #multiplier_list = [x if x > 0 else avg_multiplier for x in multiplier_list]
             multiplier_list = [x if x > 0 else macro_multiplier for x in multiplier_list]
-
+            print(f"avg_multiplier: {avg_multiplier}, macro_multiplier: {macro_multiplier}")
             #convert device counts to population counts based on multiplier series.
             df['pop_multiplier'] = multiplier_list
             df['visits_pop_calc'] = multiplier_list * df['raw_visit_counts']
