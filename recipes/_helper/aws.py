@@ -5,7 +5,8 @@ from botocore.errorfactory import ClientError
 import pprint
 import tempfile
 import shutil
-
+from dotenv import load_dotenv
+load_dotenv()
 class Aws:
     def __init__(
         self,

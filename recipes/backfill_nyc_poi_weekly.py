@@ -73,7 +73,7 @@ def my_main(split_chunk):
         s3.Bucket('recovery-data-partnership').download_file(f'output/dev/parks/safegraph-with-population/multipliers/pop_to_device_multiplier_{latest_date}.csv.zip', str(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip'))
 
         df_mult = pd.read_csv(Path(cwd) / f'multiplier_temp_{latest_date}.csv.zip', dtype={'cbg': object})
-             is_in_nyc = [True if row[:5] in ['36005', '36047', '36061', '36081', '36085'] else False for row in df_mult['cbg']]
+        is_in_nyc = [True if row[:5] in ['36005', '36047', '36061', '36081', '36085'] else False for row in df_mult['cbg']]
         df_mult_nyc = df_mult[is_in_nyc]
         df_mult_nyc.reset_index()
 
@@ -276,8 +276,9 @@ if __name__=='__main__':
     dates_list = dates_df['date_range_start']
     #filter dates
     #cutoff_date = "2021-09-27"
-    cutoff_date = "2021-10-19"
-    dates_list = [x for x in dates_list if x > cutoff_date]
+    cutoff_date = "2021-10-01"
+    max_date = "2021-11-01"
+    dates_list = [x for x in dates_list if (x > cutoff_date and x < max_date)]
     def form_lists(n_cores, list):
         i = 0
         c = 0
