@@ -78,6 +78,7 @@ def sync(
     ):
     """
     Syncing a safegraph data source, under the ./_sync folder
+    Got rid of name. Override with hard-code all.sh
     """
     command = f'''
     {env}
