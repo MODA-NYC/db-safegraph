@@ -21,10 +21,12 @@ function copy_sg {
 #$1 is SG_BASEPATH, $2 is RDP_BASEPATH
 for INFO in $(mc ls --recursive --json $1)
 do 
+    echo "Info: $Info"
     max_bg_procs 10
     (
         KEY=$(echo $INFO | jq -r '.key')
         STATUS=$(mc stat --json $2/$KEY | jq -r '.status')
+        echo $STATUS
         case $STATUS in
         success)
             # If already synced, skip
