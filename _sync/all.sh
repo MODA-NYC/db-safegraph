@@ -1,6 +1,5 @@
 #!/bin/bash
-SG_BASEPATH=sg/sg-c19-response
-RDP_BASEPATH=rdp/recovery-data-partnership/output/raw
+
 
 function max_bg_procs {
     if [[ $# -eq 0 ]] ; then
@@ -18,12 +17,16 @@ function max_bg_procs {
     done
 }
 
-for INFO in $(mc ls --recursive --json $SG_BASEPATH)
+function copy_sg { 
+#$1 is SG_BASEPATH, $2 is RDP_BASEPATH
+for INFO in $(mc ls --recursive --json $1)
 do 
+    echo "Info: $Info"
     max_bg_procs 10
     (
         KEY=$(echo $INFO | jq -r '.key')
-        STATUS=$(mc stat --json $RDP_BASEPATH/$KEY | jq -r '.status')
+        STATUS=$(mc stat --json $2/$KEY | jq -r '.status')
+        echo $STATUS
         case $STATUS in
         success)
             # If already synced, skip
@@ -31,10 +34,14 @@ do
         ;;
         error)
             # if not, create a sync ...
-            mc cp $SG_BASEPATH/$KEY $RDP_BASEPATH/$KEY
+            mc cp $1/$KEY $2/$KEY
         ;;
         esac
     ) &
 done
+}
+
+copy_sg safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
+copy_sg safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01 /safegraph-post-rdp/neighborhood-patterns/r2021-07/
 wait
 echo "raw data sync is complete"
