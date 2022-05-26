@@ -41,9 +41,10 @@ do
 done
 }
 echo "copying..."
-copy_sg safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
-copy_sg safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01 /safegraph-post-rdp/neighborhood-patterns/r2021-07/
+#copy_sg safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
+#copy_sg safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01 /safegraph-post-rdp/neighborhood-patterns/r2021-07/
 #let try to force it.
-mc cp --recursive safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
+#mc cp --recursive safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
+aws s3 sync s3://safegraph-places-outgoing/nyc_gov/weekly s3://safegraph-post-rdp/patterns
 wait
 echo "raw data sync is complete"
