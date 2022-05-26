@@ -37,7 +37,9 @@ jobs:
       - name: Sync All Raw Data
         #run: ./sg sync --name all
         shell: bash
-        run: ./_sync/all_2022.sh
+        run: |
+          chmod -x ./_sync_/all_2022.sh 
+          ./_sync/all_2022.sh
         
       #- name: Sync Core POI ...
       #  run: ./sg sync --name core_poi
