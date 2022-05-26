@@ -40,7 +40,7 @@ do
     ) &
 done
 }
-
+echo "copying..."
 copy_sg safegraph-places-outgoing/nyc_gov/weekly /safegraph-post-rdp/patterns
 copy_sg safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01 /safegraph-post-rdp/neighborhood-patterns/r2021-07/
 wait
