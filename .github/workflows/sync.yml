@@ -37,6 +37,8 @@ jobs:
       - name: Sync All Raw Data
         run: ./sg sync --name all
 
+      - name: Sync All Python
+        run: python ./_sync/all.py
         #run: |
         #  sudo chmod -x ./_sync/all_2022.sh 
         #  ./_sync/all_2022.sh
