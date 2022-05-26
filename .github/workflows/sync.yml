@@ -35,11 +35,11 @@ jobs:
           mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
 
       - name: Sync All Raw Data
-        #run: ./sg sync --name all
-        shell: bash
-        run: |
-          sudo chmod -x ./_sync/all_2022.sh 
-          ./_sync/all_2022.sh
+          run: ./sg sync --name all
+          shell: bash
+        #run: |
+        #  sudo chmod -x ./_sync/all_2022.sh 
+        #  ./_sync/all_2022.sh
         
       #- name: Sync Core POI ...
       #  run: ./sg sync --name core_poi
