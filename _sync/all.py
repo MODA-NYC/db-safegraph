@@ -9,5 +9,17 @@ copy_source = {
     'Bucket': 'safegraph-places-outgoing',
     'Key': 'nyc_gov/weekly/'
 }
-bucket = s3.Bucket('safegraph-post-rdp')
-bucket.copy(copy_source, 'patterns/') #other key. In this case the same.
+srcbucket = s3.Bucket('safegraph-places-outgoing', Prefix='nyc_gov/weekly/')
+tgtbucket = s3.Bucket('safegraph-post-rdp/')
+for file in srcbucket.objects.all():
+    copy_source = {
+        'Bucket': 'safegraph-places-outgoing/',
+        'Key': file.key
+    }
+    tgtbucket.copy(copy_source, file.key
+    )
+    print(f"{file.key} File Copied" )
+
+
+#bucket = s3.Bucket('safegraph-post-rdp')
+#bucket.copy(copy_source, 'patterns/') #other key. In this case the same.
