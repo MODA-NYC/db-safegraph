@@ -9,15 +9,14 @@ copy_source = {
     'Bucket': 'safegraph-places-outgoing',
     'Key': 'nyc_gov/weekly/'
 }
-srcbucket = s3.Bucket('safegraph-places-outgoing', Prefix='nyc_gov/weekly/')
-tgtbucket = s3.Bucket('safegraph-post-rdp/')
-for file in srcbucket.objects.all():
+srcbucket = s3.Bucket('safegraph-places-outgoing')
+tgtbucket = s3.Bucket('safegraph-post-rdp')
+for file in srcbucket.filter(Prefix='nyc_gov/weekly/'):
     copy_source = {
         'Bucket': 'safegraph-places-outgoing/',
         'Key': file.key
     }
-    tgtbucket.copy(copy_source, file.key
-    )
+    tgtbucket.copy(copy_source, file.key)
     print(f"{file.key} File Copied" )
 
 
