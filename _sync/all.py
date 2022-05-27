@@ -11,4 +11,4 @@ copy_source = {
     'Key': 'nyc_gov/weekly/'
 }
 bucket = s3.Bucket('safegraph-post-rdp')
-bucket.copy(copy_source, 'patterns') #other key. In this case the same.
+bucket.copy(copy_source, 'patterns/') #other key. In this case the same.
