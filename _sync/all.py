@@ -11,7 +11,7 @@ copy_source = {
 }
 srcbucket = s3.Bucket('safegraph-places-outgoing')
 tgtbucket = s3.Bucket('safegraph-post-rdp')
-for file in srcbucket.filter(Prefix='nyc_gov/weekly/'):
+for file in srcbucket.objects.filter(Prefix='nyc_gov/weekly/'):
     copy_source = {
         'Bucket': 'safegraph-places-outgoing/',
         'Key': file.key
