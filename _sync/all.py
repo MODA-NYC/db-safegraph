@@ -1,5 +1,7 @@
 import os
 import boto3
+import subprocess
+'''
 session = boto3.Session(
     aws_access_key_id=f'{os.getenv("SG_ACCESS_KEY_ID")}',
     aws_secret_access_key=f'{os.getenv("SG_SECRET_ACCESS_KEY")}'
@@ -22,3 +24,6 @@ for file in srcbucket.objects.filter(Prefix='nyc_gov/weekly/'):
 
 #bucket = s3.Bucket('safegraph-post-rdp')
 #bucket.copy(copy_source, 'patterns/') #other key. In this case the same.
+'''
+subprocess.run(['aws', 'configure', 'set', 'access-key-id', f'{os.getenv("SG_ACCESS_KEY_ID")}', 'secret-access-key', f"{os.getenv('SG_SECRET_ACCESS_KEY')}", 'region', 'us-east-1'], capture_output=True)
+subprocess.run(['aws', 'cp', '--recursive', 's3://safegraph-places-outgoing/nyc_gov/weekly/', 's3://safegraph-post-rdp/patterns'], capture_output=True)
