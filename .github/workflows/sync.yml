@@ -37,8 +37,24 @@ jobs:
       - name: Sync All Raw Data
         run: ./sg sync --name all
 
-      - name: Sync All Python
-        run: python ./_sync/all.py
+      - name: Sync Weekly Patterns
+        run: |
+          
+          aws configure set access-key-id $SG_ACCESS_KEY
+          aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
+          aws configure set region $RDP_REGION_NAME
+          aws s3 cp --recursive s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
+
+      - name: Sync Weekly Neighborhood Patterns
+        run: |
+          
+          aws configure set access-key-id $SG_ACCESS_KEY
+          aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
+          aws configure set region $RDP_REGION_NAME
+          aws s3 cp --recursive s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns
+
+
+
         #run: |
         #  sudo chmod -x ./_sync/all_2022.sh 
         #  ./_sync/all_2022.sh
