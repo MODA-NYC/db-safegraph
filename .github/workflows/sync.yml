@@ -34,16 +34,13 @@ jobs:
           mc config host add sg $SG_S3_ENDPOINT $SG_ACCESS_KEY_ID $SG_SECRET_ACCESS_KEY --api S3v4
           mc config host add rdp $RDP_S3_ENDPOINT $RDP_ACCESS_KEY_ID $RDP_SECRET_ACCESS_KEY --api S3v4
 
-      - name: Sync All Raw Data
-        run: ./sg sync --name all
-
       - name: Sync Weekly Patterns
         run: |
           
           aws configure set access-key-id $SG_ACCESS_KEY
           aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
           aws configure set region $RDP_REGION_NAME
-          aws s3 cp --recursive s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
+          aws s3 sync --recursive s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
 
       - name: Sync Weekly Neighborhood Patterns
         run: |
@@ -51,37 +48,8 @@ jobs:
           aws configure set access-key-id $SG_ACCESS_KEY
           aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
           aws configure set region $RDP_REGION_NAME
-          aws s3 cp --recursive s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns
+          aws s3 sync --recursive s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns
 
-
-
-        #run: |
-        #  sudo chmod -x ./_sync/all_2022.sh 
-        #  ./_sync/all_2022.sh
-        
-      #- name: Sync Core POI ...
-      #  run: ./sg sync --name core_poi
-      
-      # - name: Sync Social Distancing ...
-      #   run: ./sg sync --name social_distancing
-
-      #- name: Sync Neighborhood patterns ...
-      #  run: ./sg sync --name neighborhood_patterns
-
-      #- name: Sync Weekly Patterns and Home Panel Summary ...
-      #  run: |
-      #   ./sg sync --name weekly_patterns
-      #   ./sg sync --name home_panel_summary
-
-      #- name: Sync Monthly Patterns ...
-      #  run: ./sg sync --name monthly_patterns
-
-      #- name: Sync GeoSupplement ...
-      #  run: ./sg sync --name geo_supplement
-
-      # - name: Repair Tables ...
-      #   working-directory: _sync
-      #   run: python3 repair_tables.py
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@master
