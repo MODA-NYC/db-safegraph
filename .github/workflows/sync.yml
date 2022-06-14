@@ -35,7 +35,7 @@ jobs:
       - name: Sync Weekly Patterns
         run: |
           
-          aws configure set access-key-id $SG_ACCESS_KEY
+          aws configure set access-key-id $SG_ACCESS_KEY_ID
           aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION_NAME
           aws s3 sync s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
