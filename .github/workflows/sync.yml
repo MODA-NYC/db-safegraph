@@ -30,8 +30,7 @@ jobs:
             aws configure set aws_access_key_id $SG_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $SG_SECRET_ACCESS_KEY
             aws configure set region $AWS_REGION_NAME
-            aws s3 ls s3://safegraph-places-outgoing/nyc_gov/weekly/
-            s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/
+
           
       - name: Sync Weekly Patterns
         run: |
