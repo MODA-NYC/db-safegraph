@@ -39,16 +39,16 @@ jobs:
           
           aws configure set access-key-id $SG_ACCESS_KEY
           aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
-          aws configure set region $RDP_REGION_NAME
-          aws s3 sync --recursive s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
+          aws configure set region $AWS_REGION_NAME
+          aws s3 sync s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns
 
       - name: Sync Weekly Neighborhood Patterns
         run: |
           
           aws configure set access-key-id $SG_ACCESS_KEY
           aws configure set secret-access-key $SG_SECRET_ACCESS_KEY
-          aws configure set region $RDP_REGION_NAME
-          aws s3 sync --recursive s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns
+          aws configure set region $AWS_REGION_NAME
+          aws s3 sync s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns
 
       - name: Report Status
         if: always()
