@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: 30 0 * * *
 
-concurrency: staging_environment
+#concurrency: staging_environment
 
 jobs: 
   Sync:
