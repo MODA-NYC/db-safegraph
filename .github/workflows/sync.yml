@@ -21,26 +21,17 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Sync Weekly Patterns
-        run: |
-          
-          aws configure set aws_access_key_id $SG2_ACCESS_KEY_ID
-          aws configure set aws_secret_access_key $SG2_SECRET_ACCESS_KEY
+        run: |    
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION_NAME
           aws s3 sync s3://safegraph-places-outgoing/nyc_gov/weekly/ s3://safegraph-post-rdp/weekly-patterns/
 
 
       - name: Sync Weekly Neighborhood Patterns
         run: |
-<<<<<<< HEAD
-          echo $SG_ACCESS_KEY_ID
-          echo $SG_SECRET_ACCESS_KEY
-          echo $AWS_REGION_NAME
-          aws configure set aws_access_key_id $SG_ACCESS_KEY_ID
-=======
-          
-          aws configure set aws_access_key_id $SG2_ACCESS_KEY_ID
->>>>>>> 104-conn-2
-          aws configure set aws_secret_access_key $SG_SECRET_ACCESS_KEY
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION_NAME
           aws s3 sync s3://safegraph-places-outgoing/neighborhood-patterns/release-2021-07-01/ s3://safegraph-post-rdp/neighborhood-patterns/
 
