@@ -2,8 +2,7 @@ name: S3 bucket sync
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 30 0 * * *
+#disabled schedule
 
 #concurrency: staging_environment
 
